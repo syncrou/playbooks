@@ -5,7 +5,6 @@
   tasks:
   - name: Create Ec2 Instance
     ec2:
-      key_name: "dbtest"
       instance_type: "{{instance_type}}"
       region: "{{aws_region}}"
       image: "{{ami_id}}"
