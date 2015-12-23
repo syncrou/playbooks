@@ -4,7 +4,8 @@
   gather_facts: False
   tasks:
   - name: Create Ec2 Instance
-    ec2:
+    local_action:
+      module: ec2
       instance_type: "{{instance_type}}"
       region: "{{aws_region}}"
       image: "{{ami_id}}"
