@@ -1,6 +1,7 @@
 ---
 # Basic ec2 provisioning example
-- ec2:
+- local_action:
+    module: ec2
     key_name: "dbtest"
     instance_type: "{{instance_type}}"
     region: "{{aws_region}}"
