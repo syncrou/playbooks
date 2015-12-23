@@ -19,7 +19,7 @@
       rules_egress:
         - proto: all
           type: all
-          cidr_ip: 0.0.0.0/0
+          cidr_ip: "0.0.0.0/0"
     register: basic_firewall
 
   - name: 
