@@ -1,12 +1,15 @@
 ---
 # Basic ec2 provisioning example
-- local_action:
-    module: ec2
-    key_name: "dbtest"
-    instance_type: "{{instance_type}}"
-    region: "{{aws_region}}"
-    image: "{{ami_id}}"
-    wait: yes
-    group: webserver
-    count: 1
-    assign_public_ip: yes
+- hosts: localhost
+  gather_facts: False
+  tasks:
+  - name: Create Ec2 Instance
+    ec2:
+      key_name: "dbtest"
+      instance_type: "{{instance_type}}"
+      region: "{{aws_region}}"
+      image: "{{ami_id}}"
+      wait: yes
+      group: webserver
+      count: 1
+      assign_public_ip: yes
