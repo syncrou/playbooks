@@ -7,7 +7,7 @@
   tasks:
   - name: 
       module: ec2_group
-      name: *ssh-security-group*
+      name: "ssh-security-group"
       description: "Ssh Security group"
       region: "{{aws_region}}"
       rules:
