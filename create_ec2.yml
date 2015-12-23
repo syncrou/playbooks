@@ -7,28 +7,28 @@
   gather_facts: False
   tasks:
   - name: Create security group
-    module: ec2_group
-    name: default-ssh-group*
-    description: "Ssh security group"
-    region: "{{aws_region}}"
-    rules:
-    - proto: tcp
-      type: ssh
-      from_port: 22
-      to_port: 22
-      cidr_ip: 0.0.0.0/0
-      rules_egress:
-      - proto: all
-        type: all
+    - module: ec2_group
+      name: default-ssh-group*
+      description: "Ssh security group"
+      region: "{{aws_region}}"
+      rules:
+      - proto: tcp
+        type: ssh
+        from_port: 22
+        to_port: 22
         cidr_ip: 0.0.0.0/0
+        rules_egress:
+        - proto: all
+          type: all
+          cidr_ip: 0.0.0.0/0
     register: basic_firewall
 
   - name: create an EC2 instance
     local_action:
-    module: ec2
-    region: "{{aws_region}}"
-    group_id: "{{basic_firewall.group_id}}"
-    instance_type: "{{instance_type}}"
-    image: "{{ami_id}}"
-    wait: yes
+      - module: ec2
+        region: "{{aws_region}}"
+        group_id: "{{basic_firewall.group_id}}"
+        instance_type: "{{instance_type}}"
+        image: "{{ami_id}}"
+        wait: yes
     register: basic_ec2
