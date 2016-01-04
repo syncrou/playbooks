@@ -1,33 +1,16 @@
 ---
 # Basic ec2 provisioning example
-- name: 
-  hosts: localhost
-  connection: local
+- hosts: localhost
   gather_facts: False
   tasks:
-  - name: 
-      module: ec2_group
-      name: "ssh-security-group"
-      description: "Ssh Security group"
-      region: "{{aws_region}}"
-      rules:
-        - proto: tcp
-          type: ssh
-          from_port: 22
-          to_port: 22
-          cidr_ip: 0.0.0.0/0
-      rules_egress:
-        - proto: all
-          type: all
-          cidr_ip: 0.0.0.0/0
-    register: basic_firewall
-
-  - name: 
+  - name: Create Ec2 Instance
     local_action:
       module: ec2
-      region: "{{aws_region}}"
-      group_id: "{{basic_firewall.group_id}}"
       instance_type: "{{instance_type}}"
+      region: "{{aws_region}}"
       image: "{{ami_id}}"
       wait: yes
-    register: basic_ec2
+      group: webserver
+      count: 1
+      vpc_subnet_id: subnet-f735b6ca
+      assign_public_ip: yes
