@@ -5,11 +5,12 @@
   connection: local
   gather_facts: False
   tasks:
-    - name: Stop the sandbox instances
-      ec2:
-        instance_ids: '{{ instance_ids }}'
-        region: '{{ region }}'
-        state: stopped
-        wait: True
-        vpc_subnet_id: '{{ subnet_id }}'
-        assign_public_ip: yes
+  - name: Stop the instances
+    local_action:
+      module: ec2
+      instance_ids: '{{ instance_ids }}'
+      region: '{{ region }}'
+      state: stopped
+      wait: True
+      vpc_subnet_id: '{{ subnet_id }}'
+      assign_public_ip: yes
