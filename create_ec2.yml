@@ -7,7 +7,7 @@
     local_action:
       module: ec2
       - instance_tags: 
-      key: db-test-provision
+        key: db-test-provision
       instance_type: "{{instance_type}}"
       region: "{{aws_region}}"
       image: "{{ami_id}}"
