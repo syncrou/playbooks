@@ -12,5 +12,5 @@
       wait: yes
       group: webserver
       count: 1
-      vpc_subnet_id: subnet-f735b6ca
+      vpc_subnet_id: "{{subnet_id}}"
       assign_public_ip: yes
