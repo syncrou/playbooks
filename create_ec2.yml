@@ -6,6 +6,7 @@
   - name: Create Ec2 Instance
     local_action:
       module: ec2
+      key_name: db
       instance_type: "{{instance_type}}"
       region: "{{aws_region}}"
       image: "{{ami_id}}"
