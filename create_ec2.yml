@@ -6,7 +6,7 @@
   - key: db
   - name: db-test-provision
   - instance_type: t2.micro
-  - security_group: launch-wizard-13
+  - security_group: sg-dfe6c6a6
   - image: ami-60b6c60a
   - region: us-east-1
   - subnet: subnet-f849ff96
