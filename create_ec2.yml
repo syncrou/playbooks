@@ -5,7 +5,7 @@
   vars:
   - key: db
   - name: db-test-provision
-  - instance_type: t2.micro
+  - instance_type: t2.nano
   - security_group: sg-dfe6c6a6
   - image: ami-60b6c60a
   - region: us-east-1
