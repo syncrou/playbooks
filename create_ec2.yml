@@ -13,7 +13,7 @@
   - name: Create Ec2 Instance
     local_action:
       module: ec2
-      instance_tags: {key: "{{ key_name }}"}
+      instance_tags: {name: "{{ key_name }}"}
       group: "{{ security_group }}"
       instance_type: "{{ instance_type }}"
       region: "{{ region }}"
