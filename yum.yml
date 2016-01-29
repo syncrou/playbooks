@@ -1,0 +1,12 @@
+---
+# Upgrade all packages to the latest
+- name: upgrade all packages
+  yum: name=* state=latest
+
+# Install http ruby etc
+- name: Install http and ruby etc
+  yum: name={{ item }} state=present
+  with_items:
+   - httpd
+   - ruby
+   - git
