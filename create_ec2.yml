@@ -3,7 +3,8 @@
 - hosts: localhost
   gather_facts: False
   vars:
-  - key_name: db-test-provision
+  - key: db
+  - name: db-test-provision
   - instance_type: t2.micro
   - security_group: launch-wizard-13
   - image: ami-60b6c60a
@@ -13,7 +14,8 @@
   - name: Create Ec2 Instance
     local_action:
       module: ec2
-      instance_tags: {name: "{{ key_name }}"}
+      key_name: "{{ key }}"
+      instance_tags: {name: "{{ name }}"}
       group: "{{ security_group }}"
       instance_type: "{{ instance_type }}"
       region: "{{ region }}"
