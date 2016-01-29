@@ -1,7 +1,7 @@
 ---
 - hosts: all
   gather_facts: false
-  sudo: no
+  sudo: yes
   tasks:
   # Upgrade all packages to the latest
   - name: upgrade all packages
