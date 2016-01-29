@@ -8,11 +8,12 @@
       module: ec2
       instance_tags: 
       - key: db-test-provision
+      group: "{{ security_group }}"
       instance_type: "{{instance_type}}"
       region: "{{aws_region}}"
       image: "{{ami_id}}"
       wait: yes
       group: webserver
       count: 1
-      #vpc_subnet_id: "{{subnet_id}}"
+      vpc_subnet_id: "{{subnet_id}}"
       assign_public_ip: yes
