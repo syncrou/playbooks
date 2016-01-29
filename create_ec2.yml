@@ -15,7 +15,7 @@
     local_action:
       module: ec2
       key_name: "{{ key }}"
-      instance_tags: {name: "{{ name }}"}
+      instance_tags: {Name: "{{ name }}"}
       group_id: "{{ security_group }}"
       instance_type: "{{ instance_type }}"
       region: "{{ region }}"
