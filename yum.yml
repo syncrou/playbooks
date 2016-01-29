@@ -14,3 +14,7 @@
     - httpd
     - ruby
     - git
+    
+  # Enable the http service
+  - name: http service state
+    service: name=httpd state=started enabled=yes
