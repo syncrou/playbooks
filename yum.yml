@@ -1,12 +1,16 @@
 ---
-# Upgrade all packages to the latest
-- name: upgrade all packages
-  yum: name=* state=latest
+- hosts: all
+  gather_facts: false
+  sudo: no
+  tasks:
+  # Upgrade all packages to the latest
+  - name: upgrade all packages
+    yum: name=* state=latest
 
-# Install http ruby etc
-- name: Install http and ruby etc
-  yum: name={{ item }} state=present
-  with_items:
-   - httpd
-   - ruby
-   - git
+  # Install http ruby etc
+  - name: Install http and ruby etc
+    yum: name={{ item }} state=present
+    with_items:
+    - httpd
+    - ruby
+    - git
