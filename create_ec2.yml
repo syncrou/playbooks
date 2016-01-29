@@ -2,18 +2,25 @@
 # Basic ec2 provisioning example
 - hosts: localhost
   gather_facts: False
+  vars:
+  - key_name: db-test-provision
+  - instance_type: t2.micro
+  - security_group: launch-wizard-13
+  - image: ami-60b6c60a
+  - region: us-east-1
+  - subnet: subnet-f849ff96
   tasks:
   - name: Create Ec2 Instance
     local_action:
       module: ec2
       instance_tags: 
-      - key: db-test-provision
+      - key: "{{ key_name }}"
       group: "{{ security_group }}"
-      instance_type: "{{instance_type}}"
-      region: "{{aws_region}}"
-      image: "{{ami_id}}"
+      instance_type: "{{ instance_type }}"
+      region: "{{ region }}"
+      image: "{{ image }}"
       wait: yes
       group: webserver
       count: 1
-      vpc_subnet_id: "{{subnet_id}}"
+      vpc_subnet_id: "{{subnet}}"
       assign_public_ip: yes
