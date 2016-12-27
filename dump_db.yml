@@ -1,0 +1,27 @@
+---
+# Dump onramp prod db
+- hosts: prod
+  gather_facts: False
+  tasks:
+  - name: Pull in the db vars
+    include_vars:
+      file: secrets.yml
+      name: secret
+  - set_fact: mydate="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+  - debug: var=mydate
+  - name: Dump the {{ secret.db_name }} database to {{ secret.db_name }}_{{ mydate }}.sql
+    mysql_db:
+      login_user: "{{ secret.user }}"
+      login_password: "{{ secret.password }}"
+      login_host: "{{ secret.host }}"
+      state: dump
+      name: "{{ secret.db_name }}"
+      target: /home/centuryd/onramp/shared/database/{{ secret.db_name }}_{{ mydate }}.sql
+
+  - name: Only keep the 4 newest database dump files
+    raw: "cd /home/centuryd/onramp/shared/database/ && ls -tp | grep -v '/$' | tail -n +5 | xargs -d '\n' rm --"
+
+  - name: Fetch the database file and dump it to Dropbox
+    fetch:
+      src: /home/centuryd/onramp/shared/database/onramp_{{ mydate }}.sql
+      dest: /Volumes/SlowTrain/Dropbox/Alex/onramp_db
