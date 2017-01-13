@@ -16,12 +16,22 @@
       login_host: "{{ secret.host }}"
       state: dump
       name: "{{ secret.db_name }}"
-      target: /home/centuryd/onramp/shared/database/{{ secret.db_name }}_{{ mydate }}.sql
+      target: "{{ secret.remote_folder }}{{ secret.db_name }}_{{ mydate }}.sql"
 
   - name: Only keep the 4 newest database dump files
-    raw: "cd /home/centuryd/onramp/shared/database/ && ls -tp | grep -v '/$' | tail -n +5 | xargs -d '\n' rm --"
+    raw: "cd {{ secret.remote_folder }} && ls -tp | grep -v '/$' | tail -n +5 | xargs -d '\n' rm --"
 
-  - name: Fetch the database file and dump it to Dropbox
+  - name: Fetch the database file and dump it into Dropbox
     fetch:
-      src: /home/centuryd/onramp/shared/database/onramp_{{ mydate }}.sql
-      dest: /Volumes/SlowTrain/Dropbox/Alex/onramp_db
+      src: "{{ secret.remote_folder }}onramp_{{ mydate }}.sql"
+      dest: "{{ secret.local_folder }}"
+
+- hosts: localhost
+  gather_facts: False
+  tasks:
+  - name: Localhost changes
+    include_vars:
+      file: secrets.yml
+      name: secret
+  - name: Only keep the 2 newest files on Dropbox
+    raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | gxargs -d '\n' rm --"
