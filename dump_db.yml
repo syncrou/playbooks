@@ -1,5 +1,7 @@
 ---
-# Dump onramp prod db
+# Dump a db to a file, save up to 4 versions of that file on the remote system
+#   Fetch the file and save it on the local system (Dropbox)
+#   Save 2 versions on the local system.
 - hosts: prod
   gather_facts: False
   tasks:
