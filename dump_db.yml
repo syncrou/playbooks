@@ -9,9 +9,16 @@
     include_vars:
       file: secrets.yml
       name: secret
+    tags:
+      config
+
   - set_fact: mydate="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+    tags: config
+
   - debug: var=mydate
-  - name: Dump the {{ secret.db_name }} database to {{ secret.db_name }}_{{ mydate }}.sql
+    tags: config
+
+  - name: "Dump the {{ secret.db_name }} database to {{ secret.db_name }}_{{ mydate }}.sql"
     mysql_db:
       login_user: "{{ secret.user }}"
       login_password: "{{ secret.password }}"
@@ -19,14 +26,33 @@
       state: dump
       name: "{{ secret.db_name }}"
       target: "{{ secret.remote_folder }}{{ secret.db_name }}_{{ mydate }}.sql"
+    tags:
+      mysql
 
   - name: Only keep the 4 newest database dump files
     raw: "cd {{ secret.remote_folder }} && ls -tp | grep -v '/$' | tail -n +5 | xargs -d '\n' rm --"
+    tags: 
+      mysql
 
   - name: Fetch the database file and dump it into Dropbox
     fetch:
       src: "{{ secret.remote_folder }}onramp_{{ mydate }}.sql"
       dest: "{{ secret.local_folder }}"
+    tags: 
+      mysql
+
+  - name: Clone the master branch to Dropbox
+    git: 
+      repo: ssh://git@github.com:syncrou/onramp.git 
+      #dest: "{{ secret.git_local_folder }}onramp_git" 
+      dest: /home/dbomhof
+      accept_hostkey: "yes"
+      force: "yes"
+      recursive: "no"
+      key_file: "/home/dbomhof/.ssh/id_rsa"
+      version: "master"
+    tags:
+      git
 
 - hosts: localhost
   gather_facts: False
@@ -35,5 +61,9 @@
     include_vars:
       file: secrets.yml
       name: secret
+    tags: config
+
   - name: Only keep the 2 newest files on Dropbox
-    raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | gxargs -d '\n' rm --"
+    raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | xargs -d '\n' rm --"
+    tags: 
+      mysql
