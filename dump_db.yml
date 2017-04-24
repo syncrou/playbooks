@@ -2,6 +2,7 @@
 # Dump a db to a file, save up to 4 versions of that file on the remote system
 #   Fetch the file and save it on the local system (Dropbox)
 #   Save 2 versions on the local system.
+#   Grab the latest version of master from GitHub and save that on Dropbox
 - hosts: prod
   gather_facts: False
   tasks:
@@ -41,19 +42,6 @@
     tags: 
       mysql
 
-  - name: Clone the master branch to Dropbox
-    git: 
-      repo: ssh://git@github.com:syncrou/onramp.git 
-      #dest: "{{ secret.git_local_folder }}onramp_git" 
-      dest: /home/dbomhof
-      accept_hostkey: "yes"
-      force: "yes"
-      recursive: "no"
-      key_file: "/home/dbomhof/.ssh/id_rsa"
-      version: "master"
-    tags:
-      git
-
 - hosts: localhost
   gather_facts: False
   tasks:
@@ -67,3 +55,14 @@
     raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | xargs -d '\n' rm --"
     tags: 
       mysql
+
+  - name: Clone the master branch to Dropbox
+    git: 
+      repo: "{{ secret.git_repo }}"
+      dest: "{{ secret.git_local_folder }}onramp_git" 
+      accept_hostkey: "yes"
+      force: "yes"
+      recursive: "no"
+      version: "master"
+    tags:
+      git
