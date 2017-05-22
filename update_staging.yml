@@ -1,0 +1,59 @@
+---
+- hosts: localhost
+  gather_facts: False
+
+  vars_files:
+  - secrets_staging.yml
+
+  tasks:
+  - name: Grab the newest db dump file
+    shell: "cd {{ local_folder_combined }} && ls -Art | tail -n 1"
+    register: sql_file
+    tags: 
+      config
+
+  - debug: var=sql_file.stdout
+
+- hosts: staging
+  gather_facts: False
+
+  vars_files:
+  - secrets_staging.yml
+
+  tasks:
+  - debug: var=hostvars['localhost']['sql_file'].stdout
+    when: hostvars['localhost']['sql_file'] is defined
+
+  - name: Pull latest db from shared location
+    copy:
+      src: "{{ local_folder_combined }}/{{ hostvars['localhost']['sql_file'].stdout }}"
+      dest: "{{ remote_folder }}/{{ hostvars['localhost']['sql_file'].stdout }}"
+      owner: "{{ ansible_ssh_user }}"
+      group: "{{ ansible_ssh_user }}"
+      mode: 0644
+    tags: 
+      mysql
+
+  - name: "Update {{ db_name }} database with the latest db file"
+    mysql_db:
+      login_user: "{{ user }}"
+      login_password: "{{ password }}"
+      login_host: "{{ host }}"
+      state: import
+      name: "{{ db_name }}"
+      target: "{{ remote_folder }}/{{ hostvars['localhost']['sql_file'].stdout }}"
+    tags:
+      mysql
+
+  - name: "Restart all monit services"
+    monit:
+      name: "{{ monit_name }}"
+      state: restarted
+    become: true
+    tags:
+      monit
+
+  - name: Clean up sql file
+    shell: "cd {{ remote_folder }} && rm {{ hostvars['localhost']['sql_file'].stdout }}"
+    tags:
+      util

@@ -27,4 +27,3 @@
       target: "{{ secret.local_folder_combined }}/{{ sql_file.stdout }}"
     tags:
       mysql
-
