@@ -4,7 +4,7 @@
   tasks:
   - name: Pull in the db vars
     include_vars:
-      file: secrets_update.yml
+      file: secrets_development.yml
       name: secret
     tags:
       config
