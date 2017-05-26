@@ -43,7 +43,7 @@
       mysql
 
 - hosts: localhost
-  gather_facts: False
+  gather_facts: True
   tasks:
   - name: Localhost changes
     include_vars:
@@ -51,13 +51,13 @@
       name: secret
     tags: config
 
-  - name: Only keep the 2 newest files on Dropbox
+  - name: Only keep the 2 newest files on Dropbox (Linux)
     raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | xargs -d '\n' rm --"
     when: ansible_os_family == 'Debian'
     tags:
       mysql
 
-  - name: Only keep the 2 newest files on Dropbox
+  - name: Only keep the 2 newest files on Dropbox (OSX)
     raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | gxargs -d '\n' rm --"
     when: ansible_os_family == 'Darwin'
     tags: 
