@@ -1,0 +1,21 @@
+---
+- name: Try out any module
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+  - debug: msg="debug if needed"
+
+  - name: "ManageIQ API Passthrough"
+    ansible_manageiq_passthrough_api:
+      state: 'get'
+      miq_url: 'http://localhost:3000'
+      miq_username: 'admin'
+      miq_password: 'smartvm'
+      miq_verify_ssl: False
+      endpoint: 'hosts'
+    tags: api
+
+  - name: "Complete Dummy Test Module"
+    test:
+    tags: test
