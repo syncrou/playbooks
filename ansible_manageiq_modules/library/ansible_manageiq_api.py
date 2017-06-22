@@ -6,7 +6,7 @@ from manageiq_client.api import ManageIQClient as MiqApi
 
 DOCUMENTATION = '''
 ---
-module: manageiq_api
+module: ansible_manageiq_api
 short_description: Interface to ManageIq Rest API
 '''
 
