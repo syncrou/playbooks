@@ -6,14 +6,15 @@
     monit_name: 'unicorn_onramp_master'
 
   tasks:
-  - name: Grab the latest from branch: {{ branch | default('develop') }}
+  - name: "Grab the latest from branch: {{ branch | default('develop') }}"
     git:
       repo: "git@github.com:syncrou/onramp.git" 
       dest: "/home/centuryd/onramp/current" 
-      version: {{ branch | default('develop') }}
+      version: "{{ branch | default('develop') }}"
       update: yes
-      tags: 
-        git
+      force: yes
+    tags:
+      git
 
   - name: "Restart all monit services"
     monit:
