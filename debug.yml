@@ -7,13 +7,13 @@
   - debug: msg="debug if needed"
 
   - name: "ManageIQ API Passthrough"
-    ansible_manageiq_passthrough_api:
+    ansible_manageiq_api:
       state: 'get'
       miq_url: 'http://localhost:3000'
       miq_username: 'admin'
       miq_password: 'smartvm'
       miq_verify_ssl: False
-      endpoint: 'hosts'
+      endpoint: 'vms'
     tags: api
 
   - name: "Complete Dummy Test Module"
