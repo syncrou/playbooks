@@ -4,7 +4,7 @@
   connection: local
   gather_facts: False
   tasks:
-  - debug: msg="debug if needed"
+    #- debug: var=manageiq
 
   - name: "ManageIQ API Passthrough"
     ansible_manageiq_api:
@@ -14,6 +14,12 @@
       miq_password: 'smartvm'
       miq_verify_ssl: False
       endpoint: 'vms'
+    tags: api_one
+
+  - name: "ManageIQ API Passthrough Token"
+    ansible_manageiq_api:
+      state: 'get'
+      endpoint: 'hosts'
     tags: api
 
   - name: "Complete Dummy Test Module"
