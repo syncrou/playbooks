@@ -16,6 +16,14 @@
     tags:
       git
 
+  - name: "Migrate the Database"
+    shell: "cd /home/centuryd/onramp/current && RAILS_ENV=frt_prod rake db:migrate"
+    register: migrate
+    tags:
+      db
+
+  - debug: var=migrate.stdout
+
   - name: "Restart all monit services"
     monit:
       name: "{{ monit_name }}"
