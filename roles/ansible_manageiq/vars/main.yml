@@ -1,2 +1,6 @@
 ---
 # vars file for ansible_manageiq
+virtual_path:
+  "/home/awx/opt/deploy"
+virtual_python_bin:
+  "/home/awx/opt/bin/python"
