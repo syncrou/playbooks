@@ -3,6 +3,8 @@
   hosts: localhost
   connection: local
   gather_facts: False
+  roles:
+  - ansible_manageiq_modules
   tasks:
     #- debug: var=manageiq
 
@@ -19,6 +21,8 @@
   - name: "ManageIQ API Passthrough Token"
     ansible_manageiq_api:
       state: 'get'
+      miq_username: 'admin'
+      miq_password: 'smartvm'
       endpoint: 'hosts'
     tags: api
 
