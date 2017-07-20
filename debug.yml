@@ -4,8 +4,8 @@
   #connection: local
   gather_facts: False
   roles:
-  - ansible_manageiq_modules
   - ansible_manageiq
+  - ansible_manageiq_modules
   tasks:
     #- debug: var=manageiq
 
