@@ -1,6 +1,6 @@
 ---
 # vars file for ansible_manageiq
 virtual_path:
-  "/Users/dbomhof/syncrou/opt/deploy"
+  "~/syncrou/opt/deploy"
 virtual_python_bin:
-  "/Users/dbomhof/syncrou/opt/bin/python"
+  "~/syncrou/opt/bin/python"
