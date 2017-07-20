@@ -13,9 +13,10 @@
   package:
     name: "{{ item }}"
     state: present
+    use: brew
   with_items:
-    - python-virtualenv
-    - openssl-devel
+    - openssl
+    - pyenv-virtualenv
   tags:
     - always
 - name: "Install python libraries module dependencies"
