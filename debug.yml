@@ -2,7 +2,8 @@
 - name: Try out any module
   hosts: Home
   #connection: local
-  gather_facts: False
+  # Gather facts so the package module knows what to do
+  gather_facts: True
   roles:
   - ansible_manageiq_modules
   - ansible_manageiq
