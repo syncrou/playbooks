@@ -13,7 +13,7 @@
   package:
     name: "{{ item }}"
     state: present
-    use: brew
+    use: homebrew
   with_items:
     - openssl
     - pyenv-virtualenv
