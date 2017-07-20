@@ -1,6 +1,6 @@
 ---
 - name: Try out any module
-  hosts: home
+  hosts: Home
   connection: local
   gather_facts: False
   roles:
