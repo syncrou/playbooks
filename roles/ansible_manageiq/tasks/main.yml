@@ -28,7 +28,7 @@
     virtualenv_command: /usr/local/bin/virtualenv
   with_items:
     - pip
-    - git+https://github.com/ManageIQ/manageiq-api-client-python.git
+    - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
   tags:
     - always
 - name: "Tell subsequent tasks to use our deploy virtualenv"
