@@ -1,6 +1,6 @@
 ---
 - name: Try out any module
-  hosts: localhost
+  hosts: home
   connection: local
   gather_facts: False
   roles:
@@ -12,12 +12,12 @@
   - name: "ManageIQ API Passthrough"
     ansible_manageiq_api:
       state: 'get'
-      miq_url: 'http://localhost:3000'
+      miq_url: 'http://10.0.1.36:3000'
       miq_username: 'admin'
       miq_password: 'smartvm'
       miq_verify_ssl: False
       endpoint: 'vms'
-    tags: api_one
+    tags: api
 
   - name: "ManageIQ API Passthrough Token"
     ansible_manageiq_api:
