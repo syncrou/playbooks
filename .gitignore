@@ -1,3 +1,4 @@
 secrets.yml
 secrets_*.yml
 *.retry
+*.pyc
