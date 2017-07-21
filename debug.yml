@@ -15,7 +15,7 @@
       miq_username: 'admin'
       miq_password: 'smartvm'
       miq_verify_ssl: False
-      endpoint: 'vms'
+      endpoint: 'hosts'
     tags: api
 
   - name: "ManageIQ API Passthrough Token"
@@ -24,7 +24,7 @@
       miq_username: 'admin'
       miq_password: 'smartvm'
       endpoint: 'hosts'
-    tags: api
+    tags: api_one
 
   - name: "Complete Dummy Test Module"
     test:

@@ -1,38 +1,9 @@
 ---
-# tasks file for ansible_manageiq
-### Ansible Library Dependency setup
-# We don't want all the pip installs and various dependencies to conflict with
-# normal yum packages, this solves the issue by creating an ansible virtualenv
-# and tells ansible to use it
-###
-- name: "Create deployment folder"
-  file: 'path="{{ virtual_path }}" state=directory mode=0755'
-  tags:
-    - always
-- name: "Install ansible dependencies"
-  package:
-    name: "{{ item }}"
-    state: present
-    use: homebrew
-  with_items:
-    - openssl
-    - pyenv-virtualenv
-  tags:
-    - always
-- name: "Install python libraries module dependencies"
+- name: "Install the python api client outside of the virtual environment"
   pip:
     name: "{{ item }}"
     state: latest
-    virtualenv: "{{ virtual_path }}"
-    virtualenv_site_packages: yes
-    virtualenv_command: /usr/local/bin/virtualenv
   with_items:
-    - pip
     - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
-  tags:
-    - always
-- name: "Tell subsequent tasks to use our deploy virtualenv"
-  set_fact:
-    ansible_python_interpreter: "{{ virtual_python_bin }}"
   tags:
     - always
