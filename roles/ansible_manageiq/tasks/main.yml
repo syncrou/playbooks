@@ -23,6 +23,7 @@
   pip:
     name: "{{ item }}"
     state: latest
+    executable: /usr/local/bin/pip
     #virtualenv: "{{ virtual_path }}"
     #virtualenv_site_packages: yes
     #virtualenv_command: /usr/local/bin/virtualenv
