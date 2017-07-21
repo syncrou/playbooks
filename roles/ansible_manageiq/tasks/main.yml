@@ -2,10 +2,10 @@
 - name: "Install the python api client outside of the virtual environment"
   pip:
     name: "{{ item }}"
-    state: latest
+    state: forcereinstall
     executable: /usr/local/bin/pip
-  environment:
-    PYTHONPATH: "/usr/lib/python2.7/site-packages"
+    #environment:
+    #PYTHONPATH: "/usr/lib/python2.7/site-packages"
   with_items:
     - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
   tags:
