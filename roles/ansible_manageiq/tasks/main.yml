@@ -5,10 +5,10 @@
 # normal yum packages, this solves the issue by creating an ansible virtualenv
 # and tells ansible to use it
 ###
-#- name: "Create deployment folder"
-#  file: 'path="{{ virtual_path }}" state=directory mode=0755'
-#  tags:
-#    - always
+- name: "Create deployment folder"
+  file: 'path="{{ virtual_path }}" state=directory mode=0755'
+  tags:
+    - always
 - name: "Install ansible dependencies"
   package:
     name: "{{ item }}"
@@ -16,24 +16,23 @@
     use: homebrew
   with_items:
     - openssl
-      #- pyenv-virtualenv
+    - pyenv-virtualenv
   tags:
     - always
 - name: "Install python libraries module dependencies"
   pip:
     name: "{{ item }}"
     state: latest
-    executable: /usr/local/bin/pip
-    #virtualenv: "{{ virtual_path }}"
-    #virtualenv_site_packages: yes
-    #virtualenv_command: /usr/local/bin/virtualenv
+    virtualenv: "{{ virtual_path }}"
+    virtualenv_site_packages: yes
+    virtualenv_command: /usr/local/bin/virtualenv
   with_items:
     - pip
     - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
   tags:
     - always
-      #- name: "Tell subsequent tasks to use our deploy virtualenv"
-      #  set_fact:
-      #    ansible_python_interpreter: "{{ virtual_python_bin }}"
-      #  tags:
-      #    - always
+- name: "Tell subsequent tasks to use our deploy virtualenv"
+  set_fact:
+    ansible_python_interpreter: "{{ virtual_python_bin }}"
+  tags:
+    - always
