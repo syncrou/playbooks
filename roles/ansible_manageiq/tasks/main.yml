@@ -4,6 +4,8 @@
     name: "{{ item }}"
     state: latest
     executable: /usr/local/bin/pip
+  environment:
+    PYTHONPATH: "/usr/lib/python2.7/site-packages"
   with_items:
     - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
   tags:
