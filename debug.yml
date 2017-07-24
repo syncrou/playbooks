@@ -10,17 +10,11 @@
   - ansible_manageiq
 
   environment:
+    MIQ_TOKEN: "6eeec7c59500edfbf0bbbcee8cf040f5"
+    MIQ_URL: "http://10.0.1.36:3000"
     PYTHONPATH: "/private/var/folders/mf/4ystcct14jn_4j832jwvp0xh0000gn/T/src/manageiq-client/src:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
 
   tasks:
-  - name: save ansible base path variable for future use
-    set_fact:
-      ansible_base_path: "/Users/dbomhof/syncrou/playbooks"
-    tags: api
-  - debug:
-      msg: "Base Path: {{ ansible_base_path }}"
-    tags: api
-
   - name: "ManageIQ API Passthrough"
     ansible_manageiq_api:
       state: 'get'
@@ -29,15 +23,13 @@
       miq_password: 'smartvm'
       miq_verify_ssl: False
       endpoint: 'hosts'
-    tags: api
+    tags: api_one
 
   - name: "ManageIQ API Passthrough Token"
     ansible_manageiq_api:
       state: 'get'
-      miq_username: 'admin'
-      miq_password: 'smartvm'
       endpoint: 'hosts'
-    tags: api_one
+    tags: api
 
   - name: "Complete Dummy Test Module"
     test:
