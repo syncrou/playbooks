@@ -5,7 +5,7 @@
     state: forcereinstall
     executable: /usr/local/bin/pip
   with_items:
-    - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
+    #- git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
     - requests
   tags:
     - always
