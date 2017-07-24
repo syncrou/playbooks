@@ -1,8 +1,8 @@
 ---
 - name: Try out any module
-  #hosts: Home
-  hosts: localhost
-  connection: local
+  hosts: Home
+  #hosts: localhost
+  #connection: local
   environment:
   #  MIQ_TOKEN: "6eeec7c59500edfbf0bbbcee8cf040f5"
   #  MIQ_URL: "http://10.0.1.36:3000"
