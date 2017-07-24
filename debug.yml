@@ -25,7 +25,7 @@
       miq_verify_ssl: False
       endpoint: 'hosts'
     environment:
-      PATH: "{{ ansible_base_path }}/roles/ansible_manageiq_modules/library:$PATH"
+      PYTHONPATH: "{{ ansible_base_path }}/roles/ansible_manageiq_modules/library:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
     tags: api
 
   - name: "ManageIQ API Passthrough Token"
@@ -35,7 +35,7 @@
       miq_password: 'smartvm'
       endpoint: 'hosts'
     environment:
-      PATH: "{{ ansible_base_path }}/roles/ansible_manageiq_modules/library:$PATH"
+      PYTHONPATH: "{{ ansible_base_path }}/roles/ansible_manageiq_modules/library:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
     tags: api_one
 
   - name: "Complete Dummy Test Module"
