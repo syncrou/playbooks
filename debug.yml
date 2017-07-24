@@ -1,18 +1,17 @@
 ---
 - name: Try out any module
-  hosts: Home
-  #hosts: localhost
-  #connection: local
-  gather_facts: True
+  #hosts: Home
+  hosts: localhost
+  connection: local
+  environment:
+  #  MIQ_TOKEN: "6eeec7c59500edfbf0bbbcee8cf040f5"
+  #  MIQ_URL: "http://10.0.1.36:3000"
+    PYTHONPATH: "/private/var/folders/mf/4ystcct14jn_4j832jwvp0xh0000gn/T/src/manageiq-client/src:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
+  gather_facts: False
 
   roles:
   - ansible_manageiq_modules
   - ansible_manageiq
-
-  environment:
-    MIQ_TOKEN: "6eeec7c59500edfbf0bbbcee8cf040f5"
-    MIQ_URL: "http://10.0.1.36:3000"
-    PYTHONPATH: "/private/var/folders/mf/4ystcct14jn_4j832jwvp0xh0000gn/T/src/manageiq-client/src:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
 
   tasks:
   - name: "ManageIQ API Passthrough"
