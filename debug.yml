@@ -4,9 +4,14 @@
   #hosts: localhost
   #connection: local
   gather_facts: True
+
   roles:
   - ansible_manageiq_modules
   - ansible_manageiq
+
+  environment:
+    PYTHONPATH: "/private/var/folders/mf/4ystcct14jn_4j832jwvp0xh0000gn/T/src/manageiq-client/src:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
+
   tasks:
   - name: save ansible base path variable for future use
     set_fact:
@@ -24,9 +29,6 @@
       miq_password: 'smartvm'
       miq_verify_ssl: False
       endpoint: 'hosts'
-    environment:
-      #PYTHONPATH: "{{ ansible_base_path }}/roles/ansible_manageiq_modules/library:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
-      PYTHONPATH: "/private/var/folders/mf/4ystcct14jn_4j832jwvp0xh0000gn/T/src/manageiq-client/src:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
     tags: api
 
   - name: "ManageIQ API Passthrough Token"
@@ -35,9 +37,6 @@
       miq_username: 'admin'
       miq_password: 'smartvm'
       endpoint: 'hosts'
-    environment:
-      #PYTHONPATH: "{{ ansible_base_path }}/roles/ansible_manageiq_modules/library:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
-      PYTHONPATH: "/private/var/folders/mf/4ystcct14jn_4j832jwvp0xh0000gn/T/src/manageiq-client/src:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
     tags: api_one
 
   - name: "Complete Dummy Test Module"
