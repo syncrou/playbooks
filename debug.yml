@@ -1,12 +1,8 @@
 ---
 - name: Try out any module
-  #hosts: Home
-  hosts: localhost
-  connection: local
-  #vars:
-    #- miq_username: admin
-    #- miq_password: smartvm
-    #- miq_url: "http://10.0.1.36:3000"
+  hosts: Home
+  #hosts: localhost
+  #connection: local
 
   environment:
     PYTHONPATH: "/private/var/folders/mf/4ystcct14jn_4j832jwvp0xh0000gn/T/src/manageiq-client/src:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
