@@ -1,14 +1,17 @@
 ---
 - name: Try out any module
   hosts: Home
+  #hosts: localhost
   #connection: local
+
+  environment:
+    PYTHONPATH: "/private/var/folders/mf/4ystcct14jn_4j832jwvp0xh0000gn/T/src/manageiq-client/src:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
   gather_facts: False
   roles:
-  - ansible_manageiq
   - ansible_manageiq_modules
-  tasks:
-    #- debug: var=manageiq
+  - ansible_manageiq
 
+  tasks:
   - name: "ManageIQ API Passthrough"
     ansible_manageiq_api:
       state: 'get'
@@ -16,14 +19,12 @@
       miq_username: 'admin'
       miq_password: 'smartvm'
       miq_verify_ssl: False
-      endpoint: 'vms'
-    tags: api
+      endpoint: 'hosts'
+    tags: api_one
 
   - name: "ManageIQ API Passthrough Token"
     ansible_manageiq_api:
       state: 'get'
-      miq_username: 'admin'
-      miq_password: 'smartvm'
       endpoint: 'hosts'
     tags: api
 

@@ -1,6 +1,7 @@
 #! /usr/bin/python
 
 import os
+#import pprint
 from ansible.module_utils.basic import AnsibleModule
 from manageiq_client.api import ManageIQClient as MiqApi
 
@@ -89,6 +90,9 @@ def main():
     ca_bundle_path = module.params['ca_bundle_path']
     state = module.params['state']
     endpoint = module.params['endpoint']
+
+    #pp = pprint.PrettyPrinter(indent=4)
+    #pretty = pp.pprint(module.params)
 
     manageiq = ManageIQ(module, miq_url, miq_username, miq_password, state, miq_verify_ssl, ca_bundle_path, endpoint, miq_token)
 

@@ -3,4 +3,4 @@
 virtual_path:
   "~/syncrou/opt/deploy"
 virtual_python_bin:
-  "~/syncrou/opt/bin/python"
+  "~/syncrou/opt/deploy/bin/python"
