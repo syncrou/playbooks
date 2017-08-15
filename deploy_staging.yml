@@ -3,7 +3,6 @@
   gather_facts: False
   vars:
     branch: 'develop'
-    monit_name: 'unicorn_onramp_master'
 
   tasks:
   - name: "Grab the latest from branch: {{ branch | default('develop') }}"
@@ -26,8 +25,15 @@
 
   - name: "Restart all monit services"
     monit:
-      name: "{{ monit_name }}"
+      name: "{{ item }}"
       state: restarted
+    with_items:
+      - unicorn_onramp_master
+      - unicorn_worker_0
+      - unicorn_worker_1
+      - unicorn_worker_2
+      - unicorn_worker_3
+      - resque_worker_1
     become: true
     tags:
       monit
