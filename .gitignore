@@ -2,3 +2,4 @@ secrets.yml
 secrets_*.yml
 *.retry
 *.pyc
+*_vars.yml

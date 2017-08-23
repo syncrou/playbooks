@@ -1,15 +1,17 @@
 ---
 - hosts: staging
   gather_facts: False
-  vars:
-    branch: 'develop'
 
   tasks:
-  - name: "Grab the latest from branch: {{ branch | default('develop') }}"
+  - name: Pull in the vars file
+    include_vars:
+      file: deploy_staging_vars.yml
+      name: deploy_staging
+  - name: "Grab the latest from branch: {{ deploy_staging.branch | default('develop') }}"
     git:
       repo: "git@github.com:syncrou/onramp.git" 
       dest: "/home/centuryd/onramp/current" 
-      version: "{{ branch | default('develop') }}"
+      version: "{{ deploy_staging.branch | default('develop') }}"
       update: yes
       force: yes
     tags:
@@ -27,13 +29,7 @@
     monit:
       name: "{{ item }}"
       state: restarted
-    with_items:
-      - unicorn_onramp_master
-      - unicorn_worker_0
-      - unicorn_worker_1
-      - unicorn_worker_2
-      - unicorn_worker_3
-      - resque_worker_1
+    with_items: "{{ deploy_staging.monit }}"
     become: true
     tags:
       monit
