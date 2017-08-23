@@ -1,0 +1,10 @@
+---
+- name: "ManageIQ API Passthrough"
+  ansible_manageiq_api:
+    state: 'get'
+    miq_url: 'http://127.0.0.1:3000'
+    miq_username: 'admin'
+    miq_password: 'smartvm'
+    miq_verify_ssl: False
+    endpoint: 'hosts'
+  tags: api

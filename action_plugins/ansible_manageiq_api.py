@@ -7,20 +7,25 @@ import pprint
 
 class ActionModule(ActionBase):
     def run(self, tmp=None, task_vars=None):
-        pp = pprint.PrettyPrinter(indent=4)
-        miq_url = task_vars['miq_url']
-        miq_password = task_vars['miq_password']
-        miq_username = task_vars['miq_username']
-        pp.pprint(task_vars)
+
+        if 'debug' in task_vars:
+            pp = pprint.PrettyPrinter(indent=4)
+            pp.pprint(task_vars)
+
+
         if task_vars is None:
             task_vars = dict()
         module_vars = self._task.args.copy()
         results = super(ActionModule, self).run(tmp, task_vars)
         # remove as modules might hide due to nolog
         #del results['invocation']['module_args']
-        module_vars['miq_username'] = miq_username
-        module_vars['miq_password'] = miq_password
-        module_vars['miq_url'] = miq_url
+        for arg in ['miq_url', 'miq_username', 'miq_password']:
+            try:
+                if task_vars[arg]:
+                    module_vars[arg] = task_vars[arg]
+            except KeyError:
+                next
+
         results = merge_hash(
             results,
             self._execute_module(module_args=module_vars, task_vars=task_vars),
