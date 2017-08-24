@@ -7,4 +7,5 @@
     miq_password: 'smartvm'
     miq_verify_ssl: False
     endpoint: 'hosts'
+    debug: 'true'
   tags: api

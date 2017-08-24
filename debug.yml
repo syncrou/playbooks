@@ -13,3 +13,5 @@
 
   tasks:
   - include: tasks/manageiq_api_passthrough.yml
+  - include: tasks/manageiq_user.yml
+  - include: tasks/manageiq_update_automate.yml
