@@ -27,3 +27,10 @@
       target: "{{ secret.local_folder_combined }}/{{ sql_file.stdout }}"
     tags:
       mysql
+
+  - name: "Migrate the Database"
+    shell: "cd {{ secret.rake_folder }} && source /usr/local/share/chruby/chruby.sh && source /usr/local/share/chruby/auto.sh && RAILS_ENV=development rake db:migrate"
+    args:
+     executable: /bin/bash
+    tags:
+      db
