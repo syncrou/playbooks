@@ -54,7 +54,7 @@ class ManageIQAutomateWorkspace(object):
         """
 
         try:
-            url = self.api_url+'/automate_workspaces/'+self._guid
+            url = '%s/automate_workspaces/%s' % (self.api_url, self._guid)
             result = self.client.get(url)
         except Exception as e:
             self.module.fail_json(msg="failed to find the automate workspace %s" % (str(e)))
