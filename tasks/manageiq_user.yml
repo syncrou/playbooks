@@ -1,0 +1,15 @@
+---
+- name: "ManageIQ Add Users"
+  manageiq_user:
+    userid: 'jimmyb'
+    name: 'Jimmy Bimimy'
+    password: 'Very2Secret'
+    group: 'EvmGroup-user'
+    email: 'jbimmyb@example.com'
+    manageiq_connection:
+      #url: 'http://localhost:3000'
+      #token: '65d365b59787c141486caa7cbf7b6f91'
+      username: 'admin'
+      password: 'smartvm'
+      verify_ssl: False
+  tags: user
