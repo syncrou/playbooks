@@ -3,27 +3,11 @@
   manageiq_automate_workspace:
     guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
     workspace:
-      root:
-        ae_result: retry
-        ae_retry_interval: 60
-    #  "/Demo/System/Request/Testing":
-    #    "via_rest_age":34,
-    #    "via_rest_name":"Fordo"
-    state_vars:
-      jjunk123: "Just Set"
-      my_friend: "Barney Flintstone"
-      my_ids:
-        - 2
-        - 3
-        - 5
-        - 7
-        - 11
-        - 13,
-      my_name: "Fred Flintstone"
-      my_town: "Bedrock"
+      set_attribute:
+        root:
+          my_name: "drew"
     manageiq_connection:
       url: 'http://localhost:3000'
-        #token: '732b1d1cbb279461d6c28448f371935d'
       username: 'admin'
       password: 'smartvm'
       verify_ssl: False

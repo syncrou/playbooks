@@ -13,5 +13,5 @@
 
   tasks:
     #- include: tasks/manageiq_api_passthrough.yml
-  - import_tasks: tasks/manageiq_user.yml
-    #- include: tasks/manageiq_automate_workspace.yml
+    #- import_tasks: tasks/manageiq_user.yml
+  - import_tasks: tasks/manageiq_automate_workspace.yml
