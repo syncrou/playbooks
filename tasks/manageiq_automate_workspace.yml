@@ -2,19 +2,25 @@
 - name: "ManageIQ Modify Automate Workspace"
   manageiq_automate_workspace:
     guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
-    #workspace:
-    #  root:
-    #    ae_result: retry
-    #    ae_retry_interval: 60
+    workspace:
+      root:
+        ae_result: retry
+        ae_retry_interval: 60
     #  "/Demo/System/Request/Testing":
     #    "via_rest_age":34,
     #    "via_rest_name":"Fordo"
-    #state_vars:
-    #  "jjunk123":"Just Set",
-    #  "my_friend":"Barney Flintstone",
-    #  "my_ids":[2,3,5,7,11,13],
-    #  "my_name":"Fred Flintstone",
-    #  "my_town":"Bedrock"
+    state_vars:
+      jjunk123: "Just Set"
+      my_friend: "Barney Flintstone"
+      my_ids:
+        - 2
+        - 3
+        - 5
+        - 7
+        - 11
+        - 13,
+      my_name: "Fred Flintstone"
+      my_town: "Bedrock"
     manageiq_connection:
       url: 'http://localhost:3000'
         #token: '732b1d1cbb279461d6c28448f371935d'
@@ -22,3 +28,46 @@
       password: 'smartvm'
       verify_ssl: False
   tags: user
+
+  #- name: "simpler version"
+  #  manageiq_automate_workspace:
+  #    workspace_set: "{{ object_based_dictionary }}"
+  #
+  #- name: "Another task"
+  #  manageiq_automate_workspace:
+  #    set_retry: 
+  #
+  #- name: "Get password"
+  #  manageiq_automate_workspace:
+  #    workspace_decrypt:
+  #      root:
+  #        attribute:
+  #
+  #        
+  #- name: "Get Vm object"
+  #  manageiq_automate_workspace:
+  #    fetch_vmdb_object: 
+  #      root:
+  #        "whichvm":
+  #
+  ## "whichvm": "vmdb_reference::vms/192",
+  #- name: "Get Vm object 2"
+  #  manageiq_automate_workspace:
+  #    workspace_get: 
+  #      root:
+  #        "whichvm": 
+  #
+  ## "name": "drew",
+  #- name: "Get name from the root object"
+  #  manageiq_automate_workspace:
+  #    workspace_get: 
+  #      root:
+  #        name: 
+  #        #
+  ## "ipam_password": "miq_password::{ AES256 }23434234234",
+  ## Returns decrypted value from vmdb REST API
+  #- name: "Get password from root object"
+  #  manageiq_automate_workspace:
+  #    workspace_get: 
+  #      root:
+  #        ipam_password: 
