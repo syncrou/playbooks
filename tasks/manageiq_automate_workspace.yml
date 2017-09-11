@@ -13,6 +13,18 @@
       verify_ssl: False
   tags: user
 
+- name: "ManageIQ getAttribute"
+  manageiq_automate_workspace:
+    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
+    fetch_vmdb_object:
+      root:
+        whichvm: "vmdb_reference::vms/192"
+    manageiq_connection:
+      url: 'http://localhost:3000'
+      username: 'admin'
+      password: 'smartvm'
+      verify_ssl: False
+  tags: vm
   #- name: "simpler version"
   #  manageiq_automate_workspace:
   #    workspace_set: "{{ object_based_dictionary }}"

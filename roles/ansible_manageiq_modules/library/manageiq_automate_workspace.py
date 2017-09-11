@@ -20,7 +20,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-
 ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'status': ['preview'],
                     'supported_by': 'community'}
@@ -32,6 +31,26 @@ module: manageiq_automate_workspace
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.manageiq import ManageIQ, manageiq_argument_spec
+
+class VM(object):
+    """
+        Return a VM
+    """
+
+    def __init__(self, manageiq, resource):
+        self.manageiq = manageiq
+
+        self.module = self.manageiq.module
+        self.api_url = self.manageiq.api_url
+        self.client = self.manageiq.client
+        self._resource = resource[resource.keys()[0]].values()[0]
+
+    def get(self):
+        id = self._resource.split("::")[-1].split("/")[-1]
+        vm = self.client.collections.__getattribute__('vms').get(id=id)
+
+        return dict(changed=False, msg=vm._href)
+
 
 class Workspace(object):
     """
@@ -142,13 +161,18 @@ def main():
                                          options=manageiq_argument_spec()),
                 guid=dict(required=True, type='str'),
                 workspace=dict(required=False, type='dict'),
+                fetch_vmdb_object = dict(required=False, type='dict'),
                 state_vars = dict(required=False, type='dict')
                 ),
             )
 
     guid = module.params['guid']
     workspace = module.params['workspace']
-    workspace_actions = workspace.keys()
+    try:
+        workspace_actions = workspace.keys()
+    except Exception as e:
+        workspace_actions = None
+    fetch_vmdb_object = module.params['fetch_vmdb_object']
     state_vars = module.params['state_vars']
 
     manageiq = ManageIQ(module)
@@ -159,6 +183,9 @@ def main():
             for action in workspace_actions:
                 workspace_sandbox = manageiq_automate_workspace.get_workspace()
                 res_args = getattr(workspace_sandbox, action)(workspace[action])
+        if fetch_vmdb_object:
+            res_args = VM(manageiq, fetch_vmdb_object).get()
+
     else:
         res_args = module.fail_json(msg="failed to return the automate workspace")
 
