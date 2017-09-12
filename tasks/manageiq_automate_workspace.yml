@@ -20,27 +20,28 @@
   register: workspace
   tags: workspace_tag
 
-- debug: var=workspace.object
-  tags: workspace_tag
-
-- name: "ManageIQ getAttribute"
+- name: "ManageIQ fetch vmdb object"
   manageiq_automate_workspace:
-    fetch_vmdb_object:
-      target: "{{ workspace }}"
+    vmdb_object:
+      target: "{{ workspace.object }}"
       root:
         attribute_name: "vm"
   register: vm
-  tags: vm
+  tags: workspace_tag
 
-  #- name: "ManageIQ vmdb start"
-  #manageiq_automate_workspace:
-    #guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
-    #  start_vm: "{{ vm }}"
-    #    whichvm: "{{ vm }}"
-    #tags: vm_action
+- name: "ManageIQ vmdb start"
+  manageiq_automate_workspace:
+    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
+    start_vm: "{{ vm }}"
+    manageiq_connection:
+      url: 'http://localhost:3000'
+      username: 'admin'
+      password: 'smartvm'
+      verify_ssl: False
+  tags: workspace_tag
 
   #- name: "ManageIQ vmdb set custom attribute"
-  manageiq_automate_workspace:
+  #manageiq_automate_workspace:
     #guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
     #  start_vm: "{{ vm }}"
     #    whichvm: "{{ vm }}"

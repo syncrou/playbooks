@@ -90,11 +90,8 @@ class Workspace(object):
         Set the attribute called on the object with the passed in value
         """
         object_name = action_dict.keys()[1]
-        #object, all = self._connection.get_object(object_name)
         self._object['output']['workspace'][action_dict.keys()[0]] = action_dict.values()[0]
         result = self._object
-
-        #result = self._connection.set_object(all)
 
         return dict(changed=False, object=result)
 
@@ -153,6 +150,8 @@ class ManageIQAutomateWorkspace(object):
         try:
             url = '%s/automate_workspaces/%s' % (self.api_url, self._guid)
             result = self.client.get(url)
+            vm = VM(self.manageiq, result['input']['workspace']['root']['vm']).get()
+            result['input']['workspace']['root']['vm'] = vm
             #workspace = Workspace(result, self.manageiq, self)
         except Exception as e:
             self.module.fail_json(msg="failed to find the automate workspace %s" % (str(e)))
@@ -180,9 +179,10 @@ def main():
                                          options=manageiq_argument_spec()),
                 guid=dict(required=False, type='str'),
                 get_workspace=dict(required=False, type='dict'),
-                fetch_vmdb_object = dict(required=False, type='dict'),
-                state_vars = dict(required=False, type='dict'),
-                set_attribute = dict(required=False, type='dict')
+                vmdb_object=dict(required=False, type='dict'),
+                state_vars=dict(required=False, type='dict'),
+                set_attribute=dict(required=False, type='dict'),
+                start_vm=dict(required=False, type='dict')
                 ),
             )
 
@@ -191,12 +191,12 @@ def main():
         get_workspace = True
 
     set_attribute = module.params['set_attribute']
-
+    vmdb_object = module.params['vmdb_object']
+    start_vm = module.params['start_vm']
     try:
         workspace_actions = set_attribute.keys()
     except Exception as e:
         workspace_actions = None
-    fetch_vmdb_object = module.params['fetch_vmdb_object']
     state_vars = module.params['state_vars']
 
     try:
@@ -207,11 +207,14 @@ def main():
 
     if set_attribute and workspace_actions:
         res_args = Workspace(set_attribute['target']).set_attribute(set_attribute)
+    elif vmdb_object:
+        res_args = vmdb_object['target']['input']['workspace']['root']['vm']
     elif manageiq_automate_workspace:
-        if get_workspace:
+        if start_vm:
+            result = manageiq.client.post(start_vm['href'], action='start')
+            res_args = result
+        elif get_workspace:
             res_args = manageiq_automate_workspace.get_workspace()
-        if fetch_vmdb_object:
-            res_args = VM(manageiq, fetch_vmdb_object).get()
 
     else:
         res_args = module.fail_json(msg="failed to return the automate workspace")
