@@ -182,7 +182,9 @@ def main():
                 vmdb_object=dict(required=False, type='dict'),
                 state_vars=dict(required=False, type='dict'),
                 set_attribute=dict(required=False, type='dict'),
-                start_vm=dict(required=False, type='dict')
+                start_vm=dict(required=False, type='dict'),
+                add_attributes=dict(required=False, type='dict')
+
                 ),
             )
 
@@ -193,6 +195,7 @@ def main():
     set_attribute = module.params['set_attribute']
     vmdb_object = module.params['vmdb_object']
     start_vm = module.params['start_vm']
+    add_attributes = module.params['add_attributes']
     try:
         workspace_actions = set_attribute.keys()
     except Exception as e:
@@ -212,6 +215,11 @@ def main():
     elif manageiq_automate_workspace:
         if start_vm:
             result = manageiq.client.post(start_vm['href'], action='start')
+            res_args = result
+        elif add_attributes:
+            url = add_attributes['vm']['href']+"/custom_attributes"
+            resources = dict(name=add_attributes['custom_attributes'].keys()[0], value=add_attributes['custom_attributes'].values()[0])
+            result = manageiq.client.post(url, action='add', resources=resources)
             res_args = result
         elif get_workspace:
             res_args = manageiq_automate_workspace.get_workspace()

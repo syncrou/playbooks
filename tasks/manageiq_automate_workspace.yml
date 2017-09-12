@@ -29,7 +29,7 @@
   register: vm
   tags: workspace_tag
 
-- name: "ManageIQ vmdb start"
+- name: "ManageIQ vm start"
   manageiq_automate_workspace:
     guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
     start_vm: "{{ vm }}"
@@ -40,51 +40,16 @@
       verify_ssl: False
   tags: workspace_tag
 
-  #- name: "ManageIQ vmdb set custom attribute"
-  #manageiq_automate_workspace:
-    #guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
-    #  start_vm: "{{ vm }}"
-    #    whichvm: "{{ vm }}"
-    #tags: vm_action
-  #- name: "simpler version"
-  #  manageiq_automate_workspace:
-  #    workspace_set: "{{ object_based_dictionary }}"
-  #
-  #- name: "Another task"
-  #  manageiq_automate_workspace:
-  #    set_retry: 
-  #
-  #- name: "Get password"
-  #  manageiq_automate_workspace:
-  #    workspace_decrypt:
-  #      root:
-  #        attribute:
-  #
-  #        
-  #- name: "Get Vm object"
-  #  manageiq_automate_workspace:
-  #    fetch_vmdb_object: 
-  #      root:
-  #        "whichvm":
-  #
-  ## "whichvm": "vmdb_reference::vms/192",
-  #- name: "Get Vm object 2"
-  #  manageiq_automate_workspace:
-  #    workspace_get: 
-  #      root:
-  #        "whichvm": 
-  #
-  ## "name": "drew",
-  #- name: "Get name from the root object"
-  #  manageiq_automate_workspace:
-  #    workspace_get: 
-  #      root:
-  #        name: 
-  #        #
-  ## "ipam_password": "miq_password::{ AES256 }23434234234",
-  ## Returns decrypted value from vmdb REST API
-  #- name: "Get password from root object"
-  #  manageiq_automate_workspace:
-  #    workspace_get: 
-  #      root:
-  #        ipam_password: 
+- name: "ManageIQ vm custom attributes"
+  manageiq_automate_workspace:
+    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
+    add_attributes:
+      vm: "{{ vm }}"
+      custom_attributes:
+        ip_address: '12.34.23.54'
+    manageiq_connection:
+      url: 'http://localhost:3000'
+      username: 'admin'
+      password: 'smartvm'
+      verify_ssl: False
+  tags: workspace_tag
