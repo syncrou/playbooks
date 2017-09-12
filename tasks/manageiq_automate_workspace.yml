@@ -1,30 +1,50 @@
 ---
-- name: "ManageIQ Modify Automate Workspace"
+- name: "ManageIQ Grab the Workspace"
   manageiq_automate_workspace:
     guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
-    workspace:
-      set_attribute:
-        root:
-          my_name: "drew"
+    get_workspace:
     manageiq_connection:
       url: 'http://localhost:3000'
       username: 'admin'
       password: 'smartvm'
       verify_ssl: False
-  tags: user
+  register: workspace
+  tags: workspace_tag
+
+- name: "Set an attribute"
+  manageiq_automate_workspace:
+    set_attribute:
+      target: "{{ workspace.object }}"
+      root:
+        my_name: "drew"
+  register: workspace
+  tags: workspace_tag
+
+- debug: var=workspace.object
+  tags: workspace_tag
 
 - name: "ManageIQ getAttribute"
   manageiq_automate_workspace:
-    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
     fetch_vmdb_object:
+      target: "{{ workspace }}"
       root:
-        whichvm: "vmdb_reference::vms/192"
-    manageiq_connection:
-      url: 'http://localhost:3000'
-      username: 'admin'
-      password: 'smartvm'
-      verify_ssl: False
+        attribute_name: "vm"
+  register: vm
   tags: vm
+
+  #- name: "ManageIQ vmdb start"
+  #manageiq_automate_workspace:
+    #guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
+    #  start_vm: "{{ vm }}"
+    #    whichvm: "{{ vm }}"
+    #tags: vm_action
+
+  #- name: "ManageIQ vmdb set custom attribute"
+  manageiq_automate_workspace:
+    #guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
+    #  start_vm: "{{ vm }}"
+    #    whichvm: "{{ vm }}"
+    #tags: vm_action
   #- name: "simpler version"
   #  manageiq_automate_workspace:
   #    workspace_set: "{{ object_based_dictionary }}"

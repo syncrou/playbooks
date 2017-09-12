@@ -43,13 +43,24 @@ class VM(object):
         self.module = self.manageiq.module
         self.api_url = self.manageiq.api_url
         self.client = self.manageiq.client
-        self._resource = resource[resource.keys()[0]].values()[0]
+        #self._resource = resource[resource.keys()[0]].values()[0]
+        self._id = resource.split("::")[-1].split("/")[-1]
 
-    def get(self):
-        id = self._resource.split("::")[-1].split("/")[-1]
-        vm = self.client.collections.__getattribute__('vms').get(id=id)
+    def get(self, return_object=False):
+        #id = self._resource.split("::")[-1].split("/")[-1]
+        #vms = self.client.collections.__getattribute__('vms').get(id=id)
+        vm = self.manageiq.find_collection_resource_by('vms', id=self._id)
+        #vm = self.client.get(vms._href)
+        #if return_object:
+        #    return vm
+        #else:
+        #return dict(changed=False, msg=vm['_action'])
+        return vm['_data']
 
-        return dict(changed=False, msg=vm._href)
+    def action(self, method='start'):
+        entity = self.get(True)
+        start_action_url = entity['actions'][6]['href']
+        return dict(changed=False, msg=start_action_url)
 
 
 class Workspace(object):
@@ -57,13 +68,20 @@ class Workspace(object):
         Object to modify and get the Workspace
     """
 
-    def __init__(self, workspace, connection):
+    def __init__(self, workspace):
         self._object = workspace
-        self._connection = connection
+        #self._connection = connection
+        #self._manageiq = manageiq
+        #self._manageiq.module.fail_json(msg=workspace)
+        #self._attributes = self.lookup_attributes(attributes)
+
+    #def lookup_attributes(self, target):
+    #    vm = VM(self._manageiq, self._object['input']['workspace']['root']['vm']).get()
+    #    self._object['output']['workspace']['root']['vm'] = vm
 
     def get(self):
         """
-        Return the current Workspace object
+            Return the current Workspace object
         """
         return self._object['output']['workspace']
 
@@ -71,13 +89,14 @@ class Workspace(object):
         """
         Set the attribute called on the object with the passed in value
         """
-        object_name = action_dict.keys()[0]
-        object, all = self._connection.get_object(object_name)
-        all['workspace']['root'][action_dict.keys()[0]] = action_dict.values()[0]
+        object_name = action_dict.keys()[1]
+        #object, all = self._connection.get_object(object_name)
+        self._object['output']['workspace'][action_dict.keys()[0]] = action_dict.values()[0]
+        result = self._object
 
-        result = self._connection.set_object(all)
+        #result = self._connection.set_object(all)
 
-        return dict(changed=False, msg=result)
+        return dict(changed=False, object=result)
 
 
 class StateVars(object):
@@ -134,11 +153,11 @@ class ManageIQAutomateWorkspace(object):
         try:
             url = '%s/automate_workspaces/%s' % (self.api_url, self._guid)
             result = self.client.get(url)
-            workspace = Workspace(result, self)
+            #workspace = Workspace(result, self.manageiq, self)
         except Exception as e:
             self.module.fail_json(msg="failed to find the automate workspace %s" % (str(e)))
 
-        return workspace
+        return dict(changed=False, object=result)
 
     def get_object(self, name):
         url = '%s/automate_workspaces/%s' % (self.api_url, self._guid)
@@ -157,32 +176,40 @@ class ManageIQAutomateWorkspace(object):
 def main():
     module = AnsibleModule(
             argument_spec=dict(
-                manageiq_connection=dict(required=True, type='dict',
+                manageiq_connection=dict(required=False, type='dict',
                                          options=manageiq_argument_spec()),
-                guid=dict(required=True, type='str'),
-                workspace=dict(required=False, type='dict'),
+                guid=dict(required=False, type='str'),
+                get_workspace=dict(required=False, type='dict'),
                 fetch_vmdb_object = dict(required=False, type='dict'),
-                state_vars = dict(required=False, type='dict')
+                state_vars = dict(required=False, type='dict'),
+                set_attribute = dict(required=False, type='dict')
                 ),
             )
 
     guid = module.params['guid']
-    workspace = module.params['workspace']
+    if 'get_workspace' in module.params.keys():
+        get_workspace = True
+
+    set_attribute = module.params['set_attribute']
+
     try:
-        workspace_actions = workspace.keys()
+        workspace_actions = set_attribute.keys()
     except Exception as e:
         workspace_actions = None
     fetch_vmdb_object = module.params['fetch_vmdb_object']
     state_vars = module.params['state_vars']
 
-    manageiq = ManageIQ(module)
-    manageiq_automate_workspace = ManageIQAutomateWorkspace(manageiq, guid)
+    try:
+        manageiq = ManageIQ(module)
+        manageiq_automate_workspace = ManageIQAutomateWorkspace(manageiq, guid)
+    except Exception as e:
+        manageiq_automate_workspace = None
 
-    if manageiq_automate_workspace:
-        if workspace and workspace_actions:
-            for action in workspace_actions:
-                workspace_sandbox = manageiq_automate_workspace.get_workspace()
-                res_args = getattr(workspace_sandbox, action)(workspace[action])
+    if set_attribute and workspace_actions:
+        res_args = Workspace(set_attribute['target']).set_attribute(set_attribute)
+    elif manageiq_automate_workspace:
+        if get_workspace:
+            res_args = manageiq_automate_workspace.get_workspace()
         if fetch_vmdb_object:
             res_args = VM(manageiq, fetch_vmdb_object).get()
 
