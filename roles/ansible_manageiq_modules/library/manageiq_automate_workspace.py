@@ -183,7 +183,8 @@ def main():
                 state_vars=dict(required=False, type='dict'),
                 set_attribute=dict(required=False, type='dict'),
                 start_vm=dict(required=False, type='dict'),
-                add_attributes=dict(required=False, type='dict')
+                add_attributes=dict(required=False, type='dict'),
+                set_workspace=dict(required=False, type='dict')
 
                 ),
             )
@@ -196,6 +197,7 @@ def main():
     vmdb_object = module.params['vmdb_object']
     start_vm = module.params['start_vm']
     add_attributes = module.params['add_attributes']
+    set_workspace = module.params['set_workspace']
     try:
         workspace_actions = set_attribute.keys()
     except Exception as e:
@@ -218,9 +220,13 @@ def main():
             res_args = result
         elif add_attributes:
             url = add_attributes['vm']['href']+"/custom_attributes"
-            resources = dict(name=add_attributes['custom_attributes'].keys()[0], value=add_attributes['custom_attributes'].values()[0])
+            resources = [dict(name=add_attributes['custom_attributes'].keys()[0], value=add_attributes['custom_attributes'].values()[0])]
             result = manageiq.client.post(url, action='add', resources=resources)
             res_args = result
+        elif set_workspace:
+            url = '%s/automate_workspaces/%s' % ('http://localhost:3000/api', guid)
+            workspace = set_workspace['output']
+            res_args = manageiq.client.post(url, action='edit', resource=workspace)
         elif get_workspace:
             res_args = manageiq_automate_workspace.get_workspace()
 

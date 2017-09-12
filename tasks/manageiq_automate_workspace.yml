@@ -46,10 +46,22 @@
     add_attributes:
       vm: "{{ vm }}"
       custom_attributes:
-        ip_address: '12.34.23.54'
+        name: 'madhu'
     manageiq_connection:
       url: 'http://localhost:3000'
       username: 'admin'
       password: 'smartvm'
       verify_ssl: False
+  tags: workspace_tag
+
+- name: "ManageIQ Persist the Workspace"
+  manageiq_automate_workspace:
+    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
+    set_workspace: "{{ workspace.object }}"
+    manageiq_connection:
+      url: 'http://localhost:3000'
+      username: 'admin'
+      password: 'smartvm'
+      verify_ssl: False
+  register: workspace
   tags: workspace_tag
