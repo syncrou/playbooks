@@ -1,7 +1,7 @@
 ---
 # Takes 1 parameter passed in as --extra_vars
 # If no paramter passed in, the default sleep is 2 seconds
-# This playbook is for Fedors, CentOS, Redhat
+# This playbook is for OSX, Fedors, CentOS, Redhat
 #
 # sleep => how long to sleep in seconds
 #
