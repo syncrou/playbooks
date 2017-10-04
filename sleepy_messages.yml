@@ -1,0 +1,28 @@
+---
+# Takes 1 parameter passed in as --extra_vars
+# If no paramter passed in, the default sleep is 2 seconds
+# This playbook is for Fedors, CentOS, Redhat
+#
+# sleep => how long to sleep in seconds
+#
+# Example with a sleep parameter passed as extra_vars
+# ansible-playbook sleepy_messages.yml --extra-vars "sleep=5"
+#
+# Example without any extra_vars
+# ansible-playbook sleepy_messages.yml
+#
+  - name: "Running Sleepy Messages"
+    vars:
+      sleep: 2
+    hosts: localhost
+    gather_facts: no
+    tasks:
+    - debug: msg="Starting to feel sleepy, I'll hold off for {{ sleep }} seconds before continuing on"
+    - shell: sleep "{{ sleep }}"
+    - debug: msg="Waiting another {{ sleep }} seconds before running again"
+    - shell: sleep "{{ sleep }}"
+    - debug: msg="Waiting another {{ sleep }} seconds before finishing up"
+    - shell: sleep "{{ sleep }}"
+    - debug: msg="Ahhhh, such a nice rest.  I'm ready for the rest of the day now!"
+
+
