@@ -15,6 +15,7 @@
     vars:
       sleep: 2
     hosts: localhost
+    connection: local
     gather_facts: no
     tasks:
     - debug: msg="Starting to feel sleepy, I'll hold off for {{ sleep }} seconds before continuing on"
