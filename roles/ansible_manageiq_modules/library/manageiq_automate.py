@@ -60,11 +60,11 @@ class ManageIQAutomate(object):
         return dict(result=result)
 
 
-    def set(self, url):
+    def set(self, data):
         """
             Set any attribute, object from the REST API
         """
-        result = self._client.post(url)
+        result = self._client.post(self.url(), data)
         return  result
 
 
@@ -80,26 +80,22 @@ class Workspace(ManageIQAutomate):
         Object to modify and get the Workspace
     """
 
-    #def __init__(self, manageiq):
-    #    self._manageiq = ManageIQAutomate(manageiq)
+    def set_attribute(self, attribute):
+        """
+            Set the attribute called on the object with the passed in value
+        """
 
-    #def set_attribute(self, action_dict):
-    #    """
-    #        Set the attribute called on the object with the passed in value
-    #    """
-    #    object_name = action_dict.keys()[1]
-    #    self._object['output']['workspace'][action_dict.keys()[0]] = action_dict.values()[0]
-    #    result = self._object
-
-    #    return dict(changed=False, object=result)
+        #result = self.set(attribute)
+        result = attribute
+        return dict(changed=True, object=result)
 
     def get_workspace(self):
         """
             Get the entire Workspace
         """
 
-        results = self.get()
-        return dict(changed=False, workspace_attribute=results)
+        workspace = self.get()
+        return dict(changed=False, workspace=workspace)
 
 
     def get_attribute(self, attribute):

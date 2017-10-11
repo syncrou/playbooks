@@ -2,18 +2,13 @@
 - name: "ManageIQ Grab the Workspace"
   manageiq_automate:
     get_workspace: yes
-    manageiq_connection:
-      url: 'http://localhost:3000'
-      username: 'admin'
-      password: 'smartvm'
-      verify_ssl: False
-  register: workspace
+  register: result
   tags: workspace_tag
 
 - name: "Set an attribute"
   manageiq_automate:
     set_attribute:
-      target: "{{ workspace.object }}"
+      target: "{{ result }}"
       root:
         my_name: "drew"
   register: workspace
