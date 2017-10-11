@@ -150,23 +150,23 @@ class ManageIQAutomateWorkspace(object):
         try:
             url = '%s/automate_workspaces/%s' % (self.api_url, self._guid)
             result = self.client.get(url)
-            vm = VM(self.manageiq, result['input']['workspace']['root']['vm']).get()
-            result['input']['workspace']['root']['vm'] = vm
-            #workspace = Workspace(result, self.manageiq, self)
+            #vm = VM(self.manageiq, result['input']['workspace']['root']['vm']).get()
+            #result['input']['workspace']['root']['vm'] = vm
+            workspace = Workspace(result, self.manageiq, self)
         except Exception as e:
             self.module.fail_json(msg="failed to find the automate workspace %s" % (str(e)))
 
-        return dict(changed=False, object=result)
+        return dict(changed=False, object=workspace)
 
-    def get_object(self, name):
-        url = '%s/automate_workspaces/%s' % (self.api_url, self._guid)
-        result = self.client.get(url)
-        return result['output']['workspace'][name], result['output']
+    #def get_object(self, name):
+    #    url = '%s/automate_workspaces/%s' % (self.api_url, self._guid)
+    #    result = self.client.get(url)
+    #    return result['output']['workspace'][name], result['output']
 
-    def set_object(self, obj):
-        url = '%s/automate_workspaces/%s' % (self.api_url, self._guid)
-        result = self.client.post(url, action='edit', resource=obj)
-        return result
+    #def set_object(self, obj):
+    #    url = '%s/automate_workspaces/%s' % (self.api_url, self._guid)
+    #    result = self.client.post(url, action='edit', resource=obj)
+    #    return result
 
 
 

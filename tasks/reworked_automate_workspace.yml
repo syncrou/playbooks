@@ -1,0 +1,84 @@
+---
+- name: "ManageIQ Grab the Workspace"
+  manageiq_automate_workspace:
+    get_workspace:
+  register: workspace
+  tags: workspace_tag
+
+- name: "Set an attribute"
+  manageiq_automate_workspace:
+    set_attribute:
+      target: "{{ workspace.object }}"
+      # Add validation
+      root:
+        my_name: "drew"
+        age: '10'
+  register: workspace
+  tags: workspace_tag
+
+- name: "Set an attribute"
+  manageiq_automate_workspace:
+    set_attribute:
+      target: "{{ workspace.object }}"
+      # Add validation
+      "/Dbomhof/blah/blah":
+        my_name: "bomhof"
+  register: workspace
+  tags: workspace_tag
+  
+- name: "Get an attribute"
+  manageiq_automate_workspace:
+    get_attribute:
+      target: "{{ workspace.object }}"
+      # Add validation
+      "/Dbomhof/blah/blah":
+        my_name: 
+
+  register: 
+  tags: workspace_tag
+
+- name: "ManageIQ fetch vmdb object"
+  manageiq_automate_workspace:
+    vmdb_object:
+      target: "{{ workspace.object }}"
+      root:
+        attribute_name: "vm"
+  register: vm
+  tags: workspace_tag
+
+- name: "ManageIQ vm start"
+  manageiq_automate_workspace:
+    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
+    start_vm: "{{ vm }}"
+    manageiq_connection:
+      url: 'http://localhost:3000'
+      username: 'admin'
+      password: 'smartvm'
+      verify_ssl: False
+  tags: workspace_tag
+
+- name: "ManageIQ vm custom attributes"
+  manageiq_automate_workspace:
+    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
+    add_attributes:
+      vm: "{{ vm }}"
+      custom_attributes:
+        name: 'madhu'
+    manageiq_connection:
+      url: 'http://localhost:3000'
+      username: 'admin'
+      password: 'smartvm'
+      verify_ssl: False
+  tags: workspace_tag
+
+- name: "ManageIQ Persist the Workspace"
+  manageiq_automate_workspace:
+    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
+    set_workspace: "{{ workspace.object }}"
+    manageiq_connection:
+      url: 'http://localhost:3000'
+      username: 'admin'
+      password: 'smartvm'
+      verify_ssl: False
+  register: workspace
+  tags: workspace_tag
