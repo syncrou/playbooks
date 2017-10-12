@@ -17,7 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
+
 from __future__ import (absolute_import, division, print_function)
+import os
+
 __metaclass__ = type
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
@@ -30,7 +33,7 @@ module: manageiq_automate
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.manageiq import ManageIQ, manageiq_argument_spec
+from ansible.module_utils.manageiq import ManageIQ
 
 class ManageIQAutomate(object):
     """
@@ -39,11 +42,19 @@ class ManageIQAutomate(object):
 
     def __init__(self, manageiq):
         self._manageiq = manageiq
-        self._guid = "cf2184c0-096e-4109-a970-f9a1b2691f86"
+        self._guid = self._parse_for_guid()
 
         self._module = self._manageiq.module
         self._api_url = self._manageiq.api_url
         self._client = self._manageiq.client
+
+    def _parse_for_guid(self):
+        """
+            Grab the guid from the automate_workspace parameter
+        """
+        #url_str = self._manageiq.module.params['automate_workspace']
+        url_str = self._manageiq.module.params['manageiq_connection']['automate_workspace']
+        return url_str.split("/")[1]
 
     def url(self):
         """
@@ -105,6 +116,20 @@ class Workspace(ManageIQAutomate):
 
         results = self.get()
         return dict(changed=False, workspace_attribute=results, attribute=attribute)
+
+
+def manageiq_argument_spec():
+    return dict(
+        url=dict(default=os.environ.get('MIQ_URL', None)),
+        username=dict(default=os.environ.get('MIQ_USERNAME', None)),
+        password=dict(default=os.environ.get('MIQ_PASSWORD', None), no_log=True),
+        token=dict(default=os.environ.get('MIQ_TOKEN', None), no_log=True),
+        automate_workspace=dict(default=None, type='str', no_log=True),
+        group=dict(default=None, type='str'),
+        X_MIQ_Group=dict(default=None, type='str'),
+        verify_ssl=dict(default=True, type='bool'),
+        ca_bundle_path=dict(required=False, default=None),
+    )
 
 
 def main():

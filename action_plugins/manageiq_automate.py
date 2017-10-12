@@ -29,8 +29,20 @@ __metaclass__ = type
 from ansible.plugins.action import ActionBase
 from ansible.utils.vars import merge_hash
 
-MANAGEIQ_ARGS_MAP = {'token': 'api_token', 'url': 'api_url', 'username': 'username', 'password': 'password'}
-MANAGEIQ_MODULE_VARS = ('username', 'password', 'url', 'token')
+MANAGEIQ_ARGS_MAP = {'token': 'api_token',
+                     'url': 'api_url',
+                     'username': 'username',
+                     'password': 'password',
+                     'group': 'group',
+                     'automate_workspace': 'automate_workspace',
+                     'X-MIQ_Group': 'X-MIQ_Group'}
+MANAGEIQ_MODULE_VARS = ('username',
+                        'password',
+                        'url',
+                        'token',
+                        'group',
+                        'automate_workspace',
+                        'X-MIQ_Group')
 
 
 class ActionModule(ActionBase):
