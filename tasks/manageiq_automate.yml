@@ -14,6 +14,13 @@
   register: workspace
   tags: workspace_tag
 
+- name: "Get an attribute"
+  manageiq_automate:
+    get_attribute:
+      "/Dbomhof/System/Request/test_workspace_module":
+        my_company: "RedHat"
+  register: workspace
+  tags: workspace_tag
   #- name: "ManageIQ fetch vmdb object"
   #  manageiq_automate:
   #    vmdb_object:
