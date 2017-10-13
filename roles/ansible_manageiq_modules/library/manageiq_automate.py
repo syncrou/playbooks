@@ -77,16 +77,19 @@ class ManageIQAutomate(object):
         """
             Set any attribute, object from the REST API
         """
-        result = self._client.post(self.url(), data)
+        result = self._client.post(self.url(), action='edit', resource=data)
         return  result
 
 
-    def validate(self, attribute, obj, path):
+    def validate(self, obj, path, attribute=None):
         """
             Validate all passed objects before attempting to set or get values from them
         """
 
-        search_path = '|'.join([path, obj, attribute])
+        if attribute is None:
+            search_path = '|'.join([path, obj])
+        else:
+            search_path = '|'.join([path, obj, attribute])
         try:
             return bool(dpath.util.get(self._target, search_path, '|'))
         except KeyError as error:
@@ -100,14 +103,29 @@ class Workspace(ManageIQAutomate):
         Object to modify and get the Workspace
     """
 
-    def set_attribute(self, attribute):
+    def set_attribute(self, items):
         """
             Set the attribute called on the object with the passed in value
         """
 
-        #result = self.set(attribute)
-        result = attribute
-        return dict(changed=True, object=result)
+        new_attribute = items['attribute']
+        new_value = items['value']
+        obj = items['object']
+        search_path = "workspace|result|input|objects"
+        if self.validate(obj, search_path):
+            self._target['workspace']['result']['output']['objects'][obj][new_attribute] = new_value
+            return dict(changed=True, workspace=self._target['workspace'])
+        else:
+            msg = 'Failed to set the attribute %s with value %s for %s' % (new_attribute, new_value, obj)
+            self._module.fail_json(msg=msg, changed=False)
+
+
+    def commit_workspace(self):
+        """
+            Commit the workspace
+        """
+        workspace = self.set(self._target['workspace']['result']['output'])
+        return dict(changed=True, workspace=workspace)
 
     def get_workspace(self):
         """
@@ -159,6 +177,7 @@ def main():
                 manageiq_connection=dict(required=True, type='dict',
                                          options=manageiq_argument_spec()),
                 get_workspace=dict(type='bool', default=False),
+                commit_workspace=dict(type='bool', default=False),
                 set_attribute=dict(required=False, type='dict'),
                 get_attribute=dict(required=False, type='dict'),
                 workspace=dict(required=False, type='dict')
@@ -167,6 +186,7 @@ def main():
 
     get_attribute = module.params['get_attribute']
     get_workspace = module.params.get('get_workspace')
+    commit_workspace = module.params.get('commit_workspace')
     set_attribute = module.params['set_attribute']
     workspace_arg = module.params['workspace']
 
@@ -176,6 +196,9 @@ def main():
     result = None
     if get_workspace:
         result = workspace.get_workspace()
+        module.exit_json(**result)
+    elif commit_workspace:
+        result = workspace.commit_workspace()
         module.exit_json(**result)
     for key, value in dict(get_attribute=get_attribute, set_attribute=set_attribute).iteritems():
         if value:

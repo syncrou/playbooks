@@ -12,7 +12,7 @@
     get_attribute:
       object: "/ManageIQ/System/Request/call_instance"
       attribute: "::miq::parent"
-  tags: get
+  tags: old_get
 
   #- name: "Get a state attribute"
   #  manageiq_automate:
@@ -37,14 +37,21 @@
   #  register: workspace
   #  tags: get
   #
-  #- name: "Set an attribute"
-  #  manageiq_automate:
-  #    workspace: "{{ workspace }}"
-  #    set_attribute:
-  #      root:
-  #        my_name: "drew"
-  #  register: workspace
-  #  tags: set
+- name: "Set an attribute"
+  manageiq_automate:
+    workspace: "{{ workspace }}"
+    set_attribute:
+      object: "root"
+      attribute: "my_name"
+      value:  "tam"
+  register: workspace
+  tags: get
+
+- name: "ManageIQ Commit the Workspace"
+  manageiq_automate:
+    workspace: "{{ workspace }}"
+    commit_workspace: yes
+  tags: get
   #- name: "ManageIQ fetch vmdb object"
   #  manageiq_automate:
   #    vmdb_object:
