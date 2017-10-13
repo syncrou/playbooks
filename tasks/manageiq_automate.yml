@@ -2,25 +2,49 @@
 - name: "ManageIQ Grab the Workspace"
   manageiq_automate:
     get_workspace: yes
-  register: result
-  tags: workspace_tag
-
-- name: "Set an attribute"
-  manageiq_automate:
-    set_attribute:
-      target: "{{ result }}"
-      root:
-        my_name: "drew"
   register: workspace
-  tags: workspace_tag
+  tags: get
+
 
 - name: "Get an attribute"
   manageiq_automate:
+    workspace: "{{ workspace }}"
     get_attribute:
-      "/Dbomhof/System/Request/test_workspace_module":
-        my_company: "RedHat"
-  register: workspace
-  tags: workspace_tag
+      object: "/ManageIQ/System/Request/call_instance"
+      attribute: "::miq::parent"
+  tags: get
+
+  #- name: "Get a state attribute"
+  #  manageiq_automate:
+  #    workspace: "{{ workspace }}"
+  #    get_state_attribute:
+  #      attribute: "task_id":
+  #
+  #- name: "Get a method argument"
+  #  manageiq_automate:
+  #    workspace: "{{ workspace }}"
+  #    get_method_argument:
+  #      attribute: "hostname":
+  #
+  #- debug: var=result
+  #- name: "Get an attribute again"
+  #  manageiq_automate:
+  #    get_attribute:
+  #      current_version_of_the_workspace: "{{ result.workspace }}"
+  #      "/ManageIQ/System/Request/call_instance":
+  #        "::miq::parent":
+  #
+  #  register: workspace
+  #  tags: get
+  #
+  #- name: "Set an attribute"
+  #  manageiq_automate:
+  #    workspace: "{{ workspace }}"
+  #    set_attribute:
+  #      root:
+  #        my_name: "drew"
+  #  register: workspace
+  #  tags: set
   #- name: "ManageIQ fetch vmdb object"
   #  manageiq_automate:
   #    vmdb_object:

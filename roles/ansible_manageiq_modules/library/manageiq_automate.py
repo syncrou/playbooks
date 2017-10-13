@@ -31,7 +31,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 module: manageiq_automate
 '''
-
+import dpath.util
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.manageiq import ManageIQ
 
@@ -40,9 +40,10 @@ class ManageIQAutomate(object):
         Object to execute automate workspace management operations in manageiq.
     """
 
-    def __init__(self, manageiq):
+    def __init__(self, manageiq, workspace):
         self._manageiq = manageiq
         self._guid = self._parse_for_guid()
+        self._target = workspace
 
         self._module = self._manageiq.module
         self._api_url = self._manageiq.api_url
@@ -79,11 +80,18 @@ class ManageIQAutomate(object):
         return  result
 
 
-    def validate(self, obj, values):
+    def validate(self, attribute, obj, path):
         """
             Validate all passed objects before attempting to set or get values from them
         """
-        #return bool(self.get(obj) == values)
+
+        search_path = '|'.join([path, obj])
+        found_object = dpath.util.get(self._target, search_path, '|')
+        if found_object:
+            if found_object[attribute]:
+                return True
+        else:
+            return False
 
 
 class Workspace(ManageIQAutomate):
@@ -114,8 +122,14 @@ class Workspace(ManageIQAutomate):
             Get the passed in attribute from the Workspace
         """
 
-        results = self.get()
-        return dict(changed=False, workspace_attribute=results, attribute=attribute)
+        findable_attribute = attribute['attribute']
+        object = attribute['object']
+        search_path = "workspace|result|input|objects"
+        return_value = None
+        if self.validate(findable_attribute, object, search_path):
+            return_value = self._target['workspace']['result']['input']['objects'][object][findable_attribute]
+
+        return dict(changed=False, value=return_value)
 
 
 def manageiq_argument_spec():
@@ -142,16 +156,18 @@ def main():
                                          options=manageiq_argument_spec()),
                 get_workspace=dict(type='bool', default=False),
                 set_attribute=dict(required=False, type='dict'),
-                get_attribute=dict(required=False, type='dict')
+                get_attribute=dict(required=False, type='dict'),
+                workspace=dict(required=False, type='dict')
                 ),
             )
 
     get_attribute = module.params['get_attribute']
     get_workspace = module.params.get('get_workspace')
     set_attribute = module.params['set_attribute']
+    workspace_arg = module.params['workspace']
 
     manageiq = ManageIQ(module)
-    workspace = Workspace(manageiq)
+    workspace = Workspace(manageiq, workspace_arg)
 
     result = None
     if get_workspace:

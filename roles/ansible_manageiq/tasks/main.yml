@@ -1,11 +1,12 @@
 ---
-- name: "Install the python api client outside of the virtual environment"
+- name: "Install Required Modules"
   pip:
     name: "{{ item }}"
-    state: forcereinstall
+    #state: forcereinstall
     executable: /usr/local/bin/pip
   with_items:
     - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
     - requests
+    - dpath
   tags:
     - always
