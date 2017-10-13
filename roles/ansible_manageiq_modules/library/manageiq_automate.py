@@ -48,6 +48,7 @@ class ManageIQAutomate(object):
         self._module = self._manageiq.module
         self._api_url = self._manageiq.api_url
         self._client = self._manageiq.client
+        self._error = None
 
     def _parse_for_guid(self):
         """
@@ -85,13 +86,13 @@ class ManageIQAutomate(object):
             Validate all passed objects before attempting to set or get values from them
         """
 
-        search_path = '|'.join([path, obj])
-        found_object = dpath.util.get(self._target, search_path, '|')
-        if found_object:
-            if found_object[attribute]:
-                return True
-        else:
+        search_path = '|'.join([path, obj, attribute])
+        try:
+            return bool(dpath.util.get(self._target, search_path, '|'))
+        except KeyError as error:
+            self._error = str(error)
             return False
+
 
 
 class Workspace(ManageIQAutomate):
@@ -126,10 +127,13 @@ class Workspace(ManageIQAutomate):
         object = attribute['object']
         search_path = "workspace|result|input|objects"
         return_value = None
+
         if self.validate(findable_attribute, object, search_path):
             return_value = self._target['workspace']['result']['input']['objects'][object][findable_attribute]
 
-        return dict(changed=False, value=return_value)
+            return dict(changed=False, value=return_value)
+        else:
+            self._module.fail_json(msg="Validation failed on: "+self._error)
 
 
 def manageiq_argument_spec():
@@ -177,8 +181,9 @@ def main():
         if value:
             result = getattr(workspace, key)(value)
             module.exit_json(**result)
-    msg = "No workspace registered, possibly need pass get_workspace: True in the playbook"
-    module.exit_json(msg=msg, params=module.params)
+
+
+    module.fail_json(msg="No workspace found")
 
 
 if __name__ == "__main__":
