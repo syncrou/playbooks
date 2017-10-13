@@ -124,16 +124,16 @@ class Workspace(ManageIQAutomate):
         """
 
         findable_attribute = attribute['attribute']
-        object = attribute['object']
+        obj = attribute['object']
         search_path = "workspace|result|input|objects"
         return_value = None
 
-        if self.validate(findable_attribute, object, search_path):
-            return_value = self._target['workspace']['result']['input']['objects'][object][findable_attribute]
+        if self.validate(findable_attribute, obj, search_path):
+            return_value = self._target['workspace']['result']['input']['objects'][obj][findable_attribute]
 
             return dict(changed=False, value=return_value)
         else:
-            self._module.fail_json(msg="Validation failed on: "+self._error)
+            self._module.fail_json(msg='Validation failed on: %s' % self._error)
 
 
 def manageiq_argument_spec():
