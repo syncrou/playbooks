@@ -1,11 +1,9 @@
 ---
 - name: Try out any module
-  #hosts: Home
   hosts: localhost
   connection: local
 
   environment:
-    #PYTHONPATH: "/private/var/folders/mf/4ystcct14jn_4j832jwvp0xh0000gn/T/src/manageiq-client/src:/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
     PYTHONPATH: "/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
   gather_facts: False
   roles:
@@ -13,7 +11,5 @@
   - ansible_manageiq_modules
 
   tasks:
-    #- include: tasks/manageiq_api_passthrough.yml
     #- import_tasks: tasks/manageiq_user.yml
-    #- import_tasks: tasks/manageiq_automate_workspace.yml
   - import_tasks: tasks/manageiq_automate.yml

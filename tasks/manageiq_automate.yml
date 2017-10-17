@@ -12,5 +12,6 @@
     set_attribute:
       object: "root"
       attribute: "my_name"
-      value:  "tam"
+      value:  "Timmy"
   register: workspace
+  notify: "Commit the Workspace"
