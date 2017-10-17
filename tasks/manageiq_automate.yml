@@ -1,42 +1,11 @@
 ---
-- name: "ManageIQ Grab the Workspace"
-  manageiq_automate:
-    get_workspace: yes
-  register: workspace
-  tags: get
-
-
 - name: "Get an attribute"
   manageiq_automate:
     workspace: "{{ workspace }}"
     get_attribute:
       object: "/ManageIQ/System/Request/call_instance"
       attribute: "::miq::parent"
-  tags: old_get
 
-  #- name: "Get a state attribute"
-  #  manageiq_automate:
-  #    workspace: "{{ workspace }}"
-  #    get_state_attribute:
-  #      attribute: "task_id":
-  #
-  #- name: "Get a method argument"
-  #  manageiq_automate:
-  #    workspace: "{{ workspace }}"
-  #    get_method_argument:
-  #      attribute: "hostname":
-  #
-  #- debug: var=result
-  #- name: "Get an attribute again"
-  #  manageiq_automate:
-  #    get_attribute:
-  #      current_version_of_the_workspace: "{{ result.workspace }}"
-  #      "/ManageIQ/System/Request/call_instance":
-  #        "::miq::parent":
-  #
-  #  register: workspace
-  #  tags: get
-  #
 - name: "Set an attribute"
   manageiq_automate:
     workspace: "{{ workspace }}"
@@ -45,55 +14,3 @@
       attribute: "my_name"
       value:  "tam"
   register: workspace
-  tags: get
-
-- name: "ManageIQ Commit the Workspace"
-  manageiq_automate:
-    workspace: "{{ workspace }}"
-    commit_workspace: yes
-  tags: get
-  #- name: "ManageIQ fetch vmdb object"
-  #  manageiq_automate:
-  #    vmdb_object:
-  #      target: "{{ workspace.object }}"
-  #      root:
-  #        attribute_name: "vm"
-  #  register: vm
-  #  tags: workspace_tag
-  #
-  #- name: "ManageIQ vm start"
-  #  manageiq_automate:
-  #    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
-  #    start_vm: "{{ vm }}"
-  #    manageiq_connection:
-  #      url: 'http://localhost:3000'
-  #      username: 'admin'
-  #      password: 'smartvm'
-  #      verify_ssl: False
-  #  tags: workspace_tag
-  #
-  #- name: "ManageIQ vm custom attributes"
-  #  manageiq_automate:
-  #    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
-  #    add_attributes:
-  #      vm: "{{ vm }}"
-  #      custom_attributes:
-  #        name: 'madhu'
-  #    manageiq_connection:
-  #      url: 'http://localhost:3000'
-  #      username: 'admin'
-  #      password: 'smartvm'
-  #      verify_ssl: False
-  #  tags: workspace_tag
-  #
-  #- name: "ManageIQ Persist the Workspace"
-  #  manageiq_automate:
-  #    guid: 'ea349415-d672-4c89-818c-48b3782c24a4'
-  #    set_workspace: "{{ workspace.object }}"
-  #    manageiq_connection:
-  #      url: 'http://localhost:3000'
-  #      username: 'admin'
-  #      password: 'smartvm'
-  #      verify_ssl: False
-  #  register: workspace
-  #  tags: workspace_tag

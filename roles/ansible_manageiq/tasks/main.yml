@@ -2,11 +2,16 @@
 - name: "Install Required Modules"
   pip:
     name: "{{ item }}"
-    #state: forcereinstall
     executable: /usr/local/bin/pip
-  with_items:
+  loop:
     - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
     - requests
     - dpath
   tags:
     - always
+
+
+- name: "Grab the Automate Workspace"
+  manageiq_automate:
+    get_workspace: yes
+  register: workspace

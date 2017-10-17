@@ -42,7 +42,6 @@ class ManageIQAutomate(object):
 
     def __init__(self, manageiq, workspace):
         self._manageiq = manageiq
-        self._guid = self._parse_for_guid()
         self._target = workspace
 
         self._module = self._manageiq.module
@@ -50,19 +49,13 @@ class ManageIQAutomate(object):
         self._client = self._manageiq.client
         self._error = None
 
-    def _parse_for_guid(self):
-        """
-            Grab the guid from the automate_workspace parameter
-        """
-        #url_str = self._manageiq.module.params['automate_workspace']
-        url_str = self._manageiq.module.params['manageiq_connection']['automate_workspace']
-        return url_str.split("/")[1]
 
     def url(self):
         """
             The url to connect to the workspace
         """
-        return '%s/automate_workspaces/%s' % ('http://localhost:3000/api', self._guid)
+        url_str = self._manageiq.module.params['manageiq_connection']['automate_workspace']
+        return self._api_url + '/' + url_str
 
 
     def get(self):
@@ -103,6 +96,25 @@ class Workspace(ManageIQAutomate):
         Object to modify and get the Workspace
     """
 
+
+    def get_attribute(self, attribute):
+        """
+            Get the passed in attribute from the Workspace
+        """
+
+        findable_attribute = attribute['attribute']
+        obj = attribute['object']
+        search_path = "workspace|result|input|objects"
+        return_value = None
+
+        if self.validate(obj, search_path, findable_attribute) :
+            return_value = self._target['workspace']['result']['input']['objects'][obj][findable_attribute]
+
+            return dict(changed=False, value=return_value)
+        else:
+            self._module.fail_json(msg='Validation failed on: %s' % self._error)
+
+
     def set_attribute(self, items):
         """
             Set the attribute called on the object with the passed in value
@@ -127,6 +139,7 @@ class Workspace(ManageIQAutomate):
         workspace = self.set(self._target['workspace']['result']['output'])
         return dict(changed=True, workspace=workspace)
 
+
     def get_workspace(self):
         """
             Get the entire Workspace
@@ -134,24 +147,6 @@ class Workspace(ManageIQAutomate):
 
         workspace = self.get()
         return dict(changed=False, workspace=workspace)
-
-
-    def get_attribute(self, attribute):
-        """
-            Get the passed in attribute from the Workspace
-        """
-
-        findable_attribute = attribute['attribute']
-        obj = attribute['object']
-        search_path = "workspace|result|input|objects"
-        return_value = None
-
-        if self.validate(findable_attribute, obj, search_path):
-            return_value = self._target['workspace']['result']['input']['objects'][obj][findable_attribute]
-
-            return dict(changed=False, value=return_value)
-        else:
-            self._module.fail_json(msg='Validation failed on: %s' % self._error)
 
 
 def manageiq_argument_spec():
