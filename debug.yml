@@ -13,3 +13,9 @@
   tasks:
     #- import_tasks: tasks/manageiq_user.yml
   - import_tasks: tasks/manageiq_automate.yml
+
+  post_tasks:
+    - name: "Run the post tasks"
+      debug: msg="Committing the workspace"
+      changed_when: true
+      notify: "Commit the Workspace"
