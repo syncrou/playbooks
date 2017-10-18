@@ -7,5 +7,3 @@
     - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
     - requests
     - dpath
-  tags:
-    - always
