@@ -12,5 +12,5 @@
     set_attribute:
       object: "root"
       attribute: "my_name"
-      value:  "Caleb"
+      value:  "Freda"
   register: workspace
