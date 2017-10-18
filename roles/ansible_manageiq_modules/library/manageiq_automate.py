@@ -105,8 +105,8 @@ class Workspace(ManageIQAutomate):
         Object to modify and get the Workspace
     """
 
-    def object_exists(self, value):
-        search_path = "workspace|result|input|objects|" + value
+    def object_exists(self, dict_options):
+        search_path = "workspace|result|input|objects|" + dict_options['object']
         if self.exists(search_path):
             return dict(changed=False, value=True)
         return dict(changed=False, value=False)
@@ -126,6 +126,15 @@ class Workspace(ManageIQAutomate):
         attribute = dict_options['attribute']
         path = "workspace|result|input|state_vars"
         search_path = "|".join([path, attribute])
+        if self.exists(search_path):
+            return dict(changed=False, value=True)
+        return dict(changed=False, value=False)
+
+
+    def method_parameter_exists(self, dict_options):
+        parameter = dict_options['parameter']
+        path = "workspace|result|input|method_parameters"
+        search_path = "|".join([path, parameter])
         if self.exists(search_path):
             return dict(changed=False, value=True)
         return dict(changed=False, value=False)
@@ -158,33 +167,53 @@ class Workspace(ManageIQAutomate):
             self._module.fail_json(msg='State Var %s does not exist' % dict_options['attribute'])
 
 
-    def set_state_vars(self, items):
+    def get_method_parameter(self, dict_options):
+        """
+            Get the passed in state_var from the Workspace
+        """
+        return_value = None
+
+        if self.method_parameter_exists(dict_options):
+            return_value = self._target['workspace']['result']['input']['method_parameters'][dict_options['parameter']]
+
+            return dict(changed=False, value=return_value)
+        else:
+            self._module.fail_json(msg='Method Parameter %s does not exist' % dict_options['parameter'])
+
+    def get_object_names(self):
+        return_value = self._target['workspace']['result']['input']['objects'].keys()
+        return dict(changed=False, value=return_value)
+
+
+    def get_object_attribute_names(self, dict_options):
+        if self.object_exists(dict_options):
+            return_value = self._target['workspace']['result']['input']['objects'][dict_options['object']].keys()
+            return dict(changed=False, value=return_value)
+        else:
+            self._module.fail_json(msg='Object %s does not exist' % dict_options['object'])
+
+
+    def set_state_var(self, dict_options):
         """
             Set the state_vars called with the passed in value
         """
 
-        new_attribute = items['attribute']
-        new_value = items['value']
-        search_path = "workspace|result|input|state_vars"
-        if self.validate('', search_path):
-            self._target['workspace']['result']['input']['state_vars'][new_attribute] = new_value
-            self._target['workspace']['result']['output']['state_vars'][new_attribute] = new_value
-            return dict(changed=True, workspace=self._target['workspace'])
-        else:
-            msg = 'Failed to set the attribute %s with value %s' % (new_attribute, new_value)
-            self._module.fail_json(msg=msg, changed=False)
+        new_attribute = dict_options['attribute']
+        new_value = dict_options['value']
+        self._target['workspace']['result']['input']['state_vars'][new_attribute] = new_value
+        self._target['workspace']['result']['output']['state_vars'][new_attribute] = new_value
+        return dict(changed=True, workspace=self._target['workspace'])
 
 
-    def set_attribute(self, items):
+    def set_attribute(self, dict_options):
         """
             Set the attribute called on the object with the passed in value
         """
 
-        new_attribute = items['attribute']
-        new_value = items['value']
-        obj = items['object']
-        search_path = "workspace|result|input|objects"
-        if self.validate(obj, search_path):
+        new_attribute = dict_options['attribute']
+        new_value = dict_options['value']
+        obj = dict_options['object']
+        if self.object_exists(dict_options):
             self._target['workspace']['result']['input']['objects'][obj][new_attribute] = new_value
             new_dict = {obj:{new_attribute: new_value}}
             self._target['workspace']['result']['output']['objects'] = new_dict
@@ -202,14 +231,22 @@ class Workspace(ManageIQAutomate):
         return dict(changed=True, workspace=workspace)
 
 
-    def commit_attribute(self, items):
+    def commit_attribute(self, dict_options):
         """
             Commit the attribute called on the object with the passed in value
         """
-        workspace = self.set_attribute(items)
+        workspace = self.set_attribute(dict_options)
         self.commit_workspace()
         return workspace
 
+
+    def commit_state_var(self, dict_options):
+        """
+            Commit the attribute called on the object with the passed in value
+        """
+        workspace = self.set_state_var(dict_options)
+        self.commit_workspace()
+        return workspace
 
 
     def get_workspace(self):
@@ -253,23 +290,37 @@ def main():
                 object_exists=dict(required=False, type='str'),
                 attribute_exists=dict(required=False, type='dict'),
                 state_var_exists=dict(required=False, type='dict'),
+                method_parameter_exists=dict(required=False, type='dict'),
                 commit_attribute=dict(required=False, type='dict'),
+                commit_state_var=dict(required=False, type='dict'),
                 get_attribute=dict(required=False, type='dict'),
                 get_state_var=dict(required=False, type='dict'),
+                get_method_parameter=dict(required=False, type='dict'),
+                set_state_var=dict(required=False, type='dict'),
+                get_object_names=dict(required=False, type='bool'),
+                get_state_var_names=dict(required=False, type='bool'),
+                get_method_parameter_names=dict(required=False, type='bool'),
+                get_object_attribute_names=dict(required=False, type='dict'),
                 workspace=dict(required=False, type='dict')
                 ),
             )
 
     module_opts = {
         'get_attribute':module.params['get_attribute'],
+        'get_method_parameter':module.params['get_method_parameter'],
         'get_state_var' : module.params['get_state_var'],
+        'get_object_attribute_names' : module.params['get_object_attribute_names'],
         'object_exists' : module.params['object_exists'],
+        'method_parameter_exists' : module.params['method_parameter_exists'],
         'attribute_exists' : module.params['attribute_exists'],
         'state_var_exists' : module.params['state_var_exists'],
         'set_attribute' : module.params['set_attribute'],
+        'set_state_var' : module.params['set_state_var'],
         'commit_attribute' : module.params['commit_attribute'],
+        'commit_state_var' : module.params['commit_state_var'],
         }
 
+    get_object_names = module.params['get_object_names']
     workspace_arg = module.params['workspace']
     commit_workspace = module.params.get('commit_workspace')
     get_workspace = module.params.get('get_workspace')
@@ -282,6 +333,9 @@ def main():
         module.exit_json(**result)
     elif commit_workspace:
         result = workspace.commit_workspace()
+        module.exit_json(**result)
+    elif get_object_names:
+        result = workspace.get_object_names()
         module.exit_json(**result)
     for key, value in module_opts.iteritems():
         if value:
