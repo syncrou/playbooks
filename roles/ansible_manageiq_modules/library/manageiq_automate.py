@@ -305,39 +305,35 @@ def main():
                 ),
             )
 
-    module_opts = {
+    argument_opts = {
         'get_attribute':module.params['get_attribute'],
         'get_method_parameter':module.params['get_method_parameter'],
-        'get_state_var' : module.params['get_state_var'],
-        'get_object_attribute_names' : module.params['get_object_attribute_names'],
-        'object_exists' : module.params['object_exists'],
-        'method_parameter_exists' : module.params['method_parameter_exists'],
-        'attribute_exists' : module.params['attribute_exists'],
-        'state_var_exists' : module.params['state_var_exists'],
-        'set_attribute' : module.params['set_attribute'],
-        'set_state_var' : module.params['set_state_var'],
-        'commit_attribute' : module.params['commit_attribute'],
-        'commit_state_var' : module.params['commit_state_var'],
+        'get_state_var':module.params['get_state_var'],
+        'get_object_attribute_names':module.params['get_object_attribute_names'],
+        'object_exists':module.params['object_exists'],
+        'method_parameter_exists':module.params['method_parameter_exists'],
+        'attribute_exists':module.params['attribute_exists'],
+        'state_var_exists':module.params['state_var_exists'],
+        'set_attribute':module.params['set_attribute'],
+        'set_state_var':module.params['set_state_var'],
+        'commit_attribute':module.params['commit_attribute'],
+        'commit_state_var':module.params['commit_state_var'],
         }
 
-    get_object_names = module.params['get_object_names']
-    workspace_arg = module.params['workspace']
-    commit_workspace = module.params.get('commit_workspace')
-    get_workspace = module.params.get('get_workspace')
-    manageiq = ManageIQ(module)
-    workspace = Workspace(manageiq, workspace_arg)
+    boolean_opts = {
+        'get_object_names':module.params['get_object_names'],
+        'commit_workspace':module.params['commit_workspace'],
+        'get_workspace':module.params['get_workspace'],
+        }
 
-    result = None
-    if get_workspace:
-        result = workspace.get_workspace()
-        module.exit_json(**result)
-    elif commit_workspace:
-        result = workspace.commit_workspace()
-        module.exit_json(**result)
-    elif get_object_names:
-        result = workspace.get_object_names()
-        module.exit_json(**result)
-    for key, value in module_opts.iteritems():
+    manageiq = ManageIQ(module)
+    workspace = Workspace(manageiq, module.params['workspace'])
+
+    for key, value in boolean_opts.iteritems():
+        if value:
+            result = getattr(workspace, key)()
+            module.exit_json(**result)
+    for key, value in argument_opts.iteritems():
         if value:
             result = getattr(workspace, key)(value)
             module.exit_json(**result)
