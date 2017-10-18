@@ -73,21 +73,6 @@ class ManageIQAutomate(object):
         result = self._client.post(self.url(), action='edit', resource=data)
         return  result
 
-    def validate(self, obj, path, attribute=None):
-        """
-            Validate all passed objects before attempting to set or get values from them
-        """
-
-        if attribute is None:
-            search_path = '|'.join([path, obj])
-        else:
-            search_path = '|'.join([path, obj, attribute])
-        try:
-            return bool(dpath.util.get(self._target, search_path, '|'))
-        except KeyError as error:
-            self._error = str(error)
-            return False
-
 
     def exists(self, path):
         """
@@ -256,7 +241,7 @@ class Workspace(ManageIQAutomate):
 
         workspace = self.get()
         workspace['result']['output'] = dict()
-        workspace['result']['output']['objects'] = dict()#[obj][new_attribute] = new_value
+        workspace['result']['output']['objects'] = dict()
         workspace['result']['output']['state_vars'] = dict()
 
         return dict(changed=False, workspace=workspace)
@@ -278,7 +263,7 @@ def manageiq_argument_spec():
 
 def main():
     """
-        The entry point to the module
+        The entry point to the ManageIQ Automate module
     """
     module = AnsibleModule(
             argument_spec=dict(
