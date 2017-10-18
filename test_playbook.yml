@@ -1,0 +1,103 @@
+---
+- name: Try out any module or role
+  hosts: localhost
+  connection: local
+
+  environment:
+    PYTHONPATH: "/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
+  gather_facts: False
+  roles:
+  - ansible_manageiq
+  - ansible_manageiq_modules
+
+  pre_tasks:
+    - name: "Run the pre tasks"
+      debug: msg="Getting the workspace"
+      changed_when: true
+      notify: "Get the Workspace"
+      tags: get
+
+  tasks:
+    - name: "Check an attribute"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        attribute_exists:
+          object: "/ManageIQ/System/Request/call_instance"
+          attribute: "::miq::parent"
+
+    - name: "Get an attribute"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        get_attribute:
+          object: "/ManageIQ/System/Request/call_instance"
+          attribute: "::miq::parent"
+
+    - name: "Check a state_var"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        state_var_exists:
+          attribute: "task_id"
+
+    - name: "Get a state_var"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        get_state_var:
+          attribute: "task_id"
+
+    - name: "Set a State Var"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        set_state_var:
+          attribute: "job_id"
+          value: "xyz"
+      register: workspace
+
+    - name: "Commit a State Var"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        commit_state_var:
+          attribute: "request_id"
+          value: "999"
+      
+    - name: "Check a Method Parameter"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        method_parameter_exists:
+          parameter: "task_id"
+
+    - name: "Get a Method Parameter"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        get_method_parameter:
+          parameter: "invoice"
+
+    - name: "Get the full list of Objects"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        get_object_names: yes
+      tags: get
+
+    - name: "Get the full list of Object Attribute Names"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        get_object_attribute_names:
+          object: "root"
+      tags: get
+
+    - name: "Set an attribute"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        set_attribute:
+          object: "root"
+          attribute: "my_name"
+          value:  "Caleb"
+      register: workspace
+
+    - name: "Commit an attribute"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        commit_attribute:
+          object: "root"
+          attribute: "email"
+          value:  "fred@gmail.com"
+
