@@ -1,5 +1,5 @@
 ---
-- name: Try out any module
+- name: Try out any module or role
   hosts: localhost
   connection: local
 
@@ -9,6 +9,12 @@
   roles:
   - ansible_manageiq
   - ansible_manageiq_modules
+
+  pre_tasks:
+    - name: "Run the pre tasks"
+      debug: msg="Getting the workspace"
+      changed_when: true
+      notify: "Get the Workspace"
 
   tasks:
     #- import_tasks: tasks/manageiq_user.yml

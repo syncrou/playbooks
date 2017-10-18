@@ -4,3 +4,8 @@
   manageiq_automate:
     workspace: "{{ workspace }}"
     commit_workspace: yes
+
+- name: "Get the Workspace"
+  manageiq_automate:
+    get_workspace: yes
+  register: workspace

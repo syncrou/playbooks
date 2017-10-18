@@ -9,9 +9,3 @@
     - dpath
   tags:
     - always
-
-
-- name: "Grab the Automate Workspace"
-  manageiq_automate:
-    get_workspace: yes
-  register: workspace
