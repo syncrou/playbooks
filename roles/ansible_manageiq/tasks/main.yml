@@ -7,3 +7,8 @@
     - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
     - requests
     - dpath
+
+- name: "Get the Workspace"
+  manageiq_automate:
+    get_workspace: yes
+  register: workspace
