@@ -66,20 +66,22 @@
       manageiq_automate:
         workspace: "{{ workspace }}"
         get_object_names: yes
-      tags: get
 
-    - name: "Get the list Method Parameters"
+    - name: "Get the list of Method Parameters"
       manageiq_automate:
         workspace: "{{ workspace }}"
         get_method_parameter_names: yes
-      tags: get
+
+    - name: "Get the list of State Vars"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        get_state_var_names: yes
 
     - name: "Get the full list of Object Attribute Names"
       manageiq_automate:
         workspace: "{{ workspace }}"
         get_object_attribute_names:
           object: "root"
-      tags: get
 
     - name: "Set an attribute"
       manageiq_automate:

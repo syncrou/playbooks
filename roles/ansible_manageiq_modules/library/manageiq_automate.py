@@ -175,6 +175,11 @@ class Workspace(ManageIQAutomate):
         return dict(changed=False, value=return_value)
 
 
+    def get_state_var_names(self):
+        return_value = self._target['workspace']['result']['input']['state_vars'].keys()
+        return dict(changed=False, value=return_value)
+
+
     def get_object_attribute_names(self, dict_options):
         if self.object_exists(dict_options):
             return_value = self._target['workspace']['result']['input']['objects'][dict_options['object']].keys()
