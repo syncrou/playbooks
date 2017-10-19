@@ -170,6 +170,11 @@ class Workspace(ManageIQAutomate):
         return dict(changed=False, value=return_value)
 
 
+    def get_method_parameter_names(self):
+        return_value = self._target['workspace']['result']['input']['method_parameters'].keys()
+        return dict(changed=False, value=return_value)
+
+
     def get_object_attribute_names(self, dict_options):
         if self.object_exists(dict_options):
             return_value = self._target['workspace']['result']['input']['objects'][dict_options['object']].keys()
@@ -309,6 +314,8 @@ def main():
         'get_object_names':module.params['get_object_names'],
         'commit_workspace':module.params['commit_workspace'],
         'get_workspace':module.params['get_workspace'],
+        'get_method_parameter_names':module.params['get_method_parameter_names'],
+        'get_state_var_names':module.params['get_state_var_names']
         }
 
     manageiq = ManageIQ(module)
