@@ -33,7 +33,82 @@ module: manageiq_automate
 '''
 import dpath.util
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.manageiq import ManageIQ
+try:
+    from manageiq_client.api import ManageIQClient
+    HAS_CLIENT = True
+except ImportError:
+    HAS_CLIENT = False
+
+def check_client(module):
+    if not HAS_CLIENT:
+        module.fail_json(msg='manageiq_client.api is required for this module')
+
+def validate_connection_params(module):
+    params = module.params['manageiq_connection']
+    error_str = "missing required argument: manageiq_connection[{}]"
+    url = params['url']
+    token = params['token']
+    username = params['username']
+    password = params['password']
+
+    if (url and username and password) or (url and token):
+        return params
+    for arg in ['url', 'username', 'password']:
+        if params[arg] in (None, ''):
+            module.fail_json(msg=error_str.format(arg))
+
+class ManageIQ(object):
+    """
+        class encapsulating ManageIQ API client.
+    """
+
+    def __init__(self, module):
+        # handle import errors
+        check_client(module)
+        params = validate_connection_params(module)
+
+        url = params['url']
+        username = params['username']
+        password = params['password']
+        token = params['token']
+        verify_ssl = params['verify_ssl']
+        ca_bundle_path = params['ca_bundle_path']
+
+        self._module = module
+        self._api_url = url + '/api'
+        self._auth = dict(user=username, password=password, token=token)
+        try:
+            self._client = ManageIQClient(self._api_url, self._auth, verify_ssl=verify_ssl, ca_bundle_path=ca_bundle_path)
+        except Exception as e:
+            self.module.fail_json(msg="failed to open connection (%s): %s" % (url, str(e)))
+
+    @property
+    def module(self):
+        """ Ansible module module
+
+        Returns:
+            the ansible module
+        """
+        return self._module
+
+    @property
+    def api_url(self):
+        """ Base ManageIQ API
+
+        Returns:
+            the base ManageIQ API
+        """
+        return self._api_url
+
+    @property
+    def client(self):
+        """ ManageIQ client
+
+        Returns:
+            the ManageIQ client
+        """
+        return self._client
+
 
 class ManageIQAutomate(object):
     """
