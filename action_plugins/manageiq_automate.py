@@ -65,15 +65,7 @@ class ActionModule(ActionBase):
                 except KeyError:
                     pass
 
-        if verify_ssl:
-            module_vars['manageiq_connection']['verify_ssl'] = verify_ssl
-
-        try:
-            if module_vars['manageiq_connection']['username'] and module_vars['manageiq_connection']['password']:
-                #module_vars['manageiq_connection'].pop('token')
-                pass
-        except KeyError:
-            pass
+        module_vars['manageiq_connection']['verify_ssl'] = verify_ssl
 
         return module_vars
 
