@@ -68,8 +68,8 @@ class ManageIQ(object):
         params = validate_connection_params(module)
 
         url = params['url']
-        username = params['username']
-        password = params['password']
+        username = params.get('username')
+        password = params.get('password')
         token = params.get('token')
         verify_ssl = params.get('verify_ssl')
         ca_bundle_path = params.get('ca_bundle_path')
