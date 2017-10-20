@@ -47,9 +47,9 @@ def validate_connection_params(module):
     params = module.params['manageiq_connection']
     error_str = "missing required argument: manageiq_connection[{}]"
     url = params['url']
-    token = params['token']
-    username = params['username']
-    password = params['password']
+    token = params.get('token')
+    username = params.get('username')
+    password = params.get('password')
 
     if (url and username and password) or (url and token):
         return params
@@ -70,9 +70,9 @@ class ManageIQ(object):
         url = params['url']
         username = params['username']
         password = params['password']
-        token = params['token']
-        verify_ssl = params['verify_ssl']
-        ca_bundle_path = params['ca_bundle_path']
+        token = params.get('token')
+        verify_ssl = params.get('verify_ssl')
+        ca_bundle_path = params.get('ca_bundle_path')
 
         self._module = module
         self._api_url = url + '/api'
