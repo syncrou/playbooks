@@ -70,7 +70,8 @@ class ActionModule(ActionBase):
 
         try:
             if module_vars['manageiq_connection']['username'] and module_vars['manageiq_connection']['password']:
-                module_vars['manageiq_connection'].pop('token')
+                #module_vars['manageiq_connection'].pop('token')
+                pass
         except KeyError:
             pass
 
