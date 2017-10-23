@@ -293,6 +293,24 @@ class Workspace(ManageIQAutomate):
             self._module.fail_json(msg=msg, changed=False)
 
 
+    def set_attributes(self, dict_options):
+        """
+            Set the attributes called on the object with the passed in values
+        """
+        new_attributes = dict_options['attributes']
+        obj = dict_options['object']
+        if self.object_exists(dict_options):
+            for items in new_attributes:
+                new_attribute = items.keys()[0]
+                new_value = items.values()[0]
+                self._target['workspace']['result']['input']['objects'][obj][new_attribute] = new_value
+                self._target['workspace']['result']['output']['objects'][obj][new_attribute] = new_value
+            return dict(changed=True, workspace=self._target['workspace'])
+        else:
+            msg = 'Failed to set the attributes %s for %s' % (new_attributes, obj)
+            self._module.fail_json(msg=msg, changed=False)
+
+
     def commit_workspace(self):
         """
             Commit the workspace
@@ -357,6 +375,7 @@ def main():
                 get_workspace=dict(type='bool', default=False),
                 commit_workspace=dict(type='bool', default=False),
                 set_attribute=dict(required=False, type='dict'),
+                set_attributes=dict(required=False, type='dict'),
                 object_exists=dict(required=False, type='str'),
                 attribute_exists=dict(required=False, type='dict'),
                 state_var_exists=dict(required=False, type='dict'),
@@ -385,6 +404,7 @@ def main():
         'attribute_exists':module.params['attribute_exists'],
         'state_var_exists':module.params['state_var_exists'],
         'set_attribute':module.params['set_attribute'],
+        'set_attributes':module.params['set_attributes'],
         'set_state_var':module.params['set_state_var'],
         'commit_attribute':module.params['commit_attribute'],
         'commit_state_var':module.params['commit_state_var'],

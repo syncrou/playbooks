@@ -92,6 +92,17 @@
           value:  "Caleb"
       register: workspace
 
+    - name: "Set attributes"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        set_attributes:
+          object: "root"
+          attributes:
+            - country_one: AU
+            - price: 4990000
+            - country: BE
+      register: workspace
+
     - name: "Commit an attribute"
       manageiq_automate:
         workspace: "{{ workspace }}"
@@ -100,3 +111,8 @@
           attribute: "email"
           value:  "fred@gmail.com"
 
+  post_tasks:
+    - name: "Run the post tasks"
+      debug: msg="Committing the workspace"
+      changed_when: true
+      notify: "Commit the Workspace"
