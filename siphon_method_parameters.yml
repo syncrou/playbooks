@@ -23,4 +23,3 @@
         commit_attributes:
           object: "{{ object }}"
           attributes: "{{ method_params.value }}"
-      register: workspace
