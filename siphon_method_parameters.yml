@@ -1,7 +1,9 @@
 ---
-- name: Try out any module or role
+- name: Siphon Method Parameters into an object
   hosts: localhost
   connection: local
+  vars:
+    - object: root
 
   gather_facts: False
   roles:
@@ -19,6 +21,6 @@
       manageiq_automate:
         workspace: "{{ workspace }}"
         commit_attributes:
-          object: "root"
+          object: "{{ object }}"
           attributes: "{{ method_params.value }}"
       register: workspace
