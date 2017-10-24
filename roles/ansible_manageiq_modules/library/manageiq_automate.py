@@ -245,8 +245,8 @@ class Workspace(ManageIQAutomate):
         return dict(changed=False, value=return_value)
 
 
-    def get_method_parameter_names(self):
-        return_value = self._target['workspace']['result']['input']['method_parameters'].keys()
+    def get_method_parameters(self):
+        return_value = self._target['workspace']['result']['input']['method_parameters']
         return dict(changed=False, value=return_value)
 
 
@@ -300,10 +300,10 @@ class Workspace(ManageIQAutomate):
         new_attributes = dict_options['attributes']
         obj = dict_options['object']
         if self.object_exists(dict_options):
-            for items in new_attributes:
-                new_attribute = items.keys()[0]
-                new_value = items.values()[0]
+            for new_attribute, new_value in new_attributes.iteritems():
                 self._target['workspace']['result']['input']['objects'][obj][new_attribute] = new_value
+                if self._target['workspace']['result']['output']['objects'].get(obj) == None:
+                    self._target['workspace']['result']['output']['objects'][obj] = dict()
                 self._target['workspace']['result']['output']['objects'][obj][new_attribute] = new_value
             return dict(changed=True, workspace=self._target['workspace'])
         else:
@@ -388,7 +388,7 @@ def main():
                 set_state_var=dict(required=False, type='dict'),
                 get_object_names=dict(required=False, type='bool'),
                 get_state_var_names=dict(required=False, type='bool'),
-                get_method_parameter_names=dict(required=False, type='bool'),
+                get_method_parameters=dict(required=False, type='bool'),
                 get_object_attribute_names=dict(required=False, type='dict'),
                 workspace=dict(required=False, type='dict')
                 ),
@@ -414,7 +414,7 @@ def main():
         'get_object_names':module.params['get_object_names'],
         'commit_workspace':module.params['commit_workspace'],
         'get_workspace':module.params['get_workspace'],
-        'get_method_parameter_names':module.params['get_method_parameter_names'],
+        'get_method_parameters':module.params['get_method_parameters'],
         'get_state_var_names':module.params['get_state_var_names']
         }
 
