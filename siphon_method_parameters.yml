@@ -1,0 +1,24 @@
+---
+- name: Try out any module or role
+  hosts: localhost
+  connection: local
+
+  gather_facts: False
+  roles:
+  - ansible_manageiq_modules
+  - ansible_manageiq
+
+  tasks:
+    - name: "Get the list of Method Parameters"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        get_method_parameters: yes
+      register: method_params
+
+    - name: "Commit a set of attributes"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        commit_attributes:
+          object: "root"
+          attributes: "{{ method_params.value }}"
+      register: workspace
