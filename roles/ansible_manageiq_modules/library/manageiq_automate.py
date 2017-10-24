@@ -302,7 +302,7 @@ class Workspace(ManageIQAutomate):
         if self.object_exists(dict_options):
             for new_attribute, new_value in new_attributes.iteritems():
                 self._target['workspace']['result']['input']['objects'][obj][new_attribute] = new_value
-                if self._target['workspace']['result']['output']['objects'].get(obj) == None:
+                if self._target['workspace']['result']['output']['objects'].get(obj) is None:
                     self._target['workspace']['result']['output']['objects'][obj] = dict()
                 self._target['workspace']['result']['output']['objects'][obj][new_attribute] = new_value
             return dict(changed=True, workspace=self._target['workspace'])
@@ -328,9 +328,18 @@ class Workspace(ManageIQAutomate):
         return workspace
 
 
+    def commit_attributes(self, dict_options):
+        """
+            Commit the attributes called on the object with the passed in values
+        """
+        workspace = self.set_attributes(dict_options)
+        self.commit_workspace()
+        return workspace
+
+
     def commit_state_var(self, dict_options):
         """
-            Commit the attribute called on the object with the passed in value
+            Commit the state_var called on the object with the passed in value
         """
         workspace = self.set_state_var(dict_options)
         self.commit_workspace()
@@ -381,6 +390,7 @@ def main():
                 state_var_exists=dict(required=False, type='dict'),
                 method_parameter_exists=dict(required=False, type='dict'),
                 commit_attribute=dict(required=False, type='dict'),
+                commit_attributes=dict(required=False, type='dict'),
                 commit_state_var=dict(required=False, type='dict'),
                 get_attribute=dict(required=False, type='dict'),
                 get_state_var=dict(required=False, type='dict'),
@@ -407,6 +417,7 @@ def main():
         'set_attributes':module.params['set_attributes'],
         'set_state_var':module.params['set_state_var'],
         'commit_attribute':module.params['commit_attribute'],
+        'commit_attributes':module.params['commit_attributes'],
         'commit_state_var':module.params['commit_state_var'],
         }
 
