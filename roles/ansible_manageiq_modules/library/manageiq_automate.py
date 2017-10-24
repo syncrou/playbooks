@@ -166,6 +166,10 @@ class Workspace(ManageIQAutomate):
     """
 
     def object_exists(self, dict_options):
+        """
+            Check if the specific object exists
+        """
+
         search_path = "workspace|result|input|objects|" + dict_options['object']
         if self.exists(search_path):
             return dict(changed=False, value=True)
@@ -173,6 +177,10 @@ class Workspace(ManageIQAutomate):
 
 
     def attribute_exists(self, dict_options):
+        """
+            Check if the specific attribute exists
+        """
+
         obj = dict_options['object']
         attribute = dict_options['attribute']
         path = "workspace|result|input|objects"
@@ -183,6 +191,10 @@ class Workspace(ManageIQAutomate):
 
 
     def state_var_exists(self, dict_options):
+        """
+            Check if the specific state_var exists
+        """
+
         attribute = dict_options['attribute']
         path = "workspace|result|input|state_vars"
         search_path = "|".join([path, attribute])
@@ -192,6 +204,10 @@ class Workspace(ManageIQAutomate):
 
 
     def method_parameter_exists(self, dict_options):
+        """
+            Check if the specific method_parameter exists
+        """
+
         parameter = dict_options['parameter']
         path = "workspace|result|input|method_parameters"
         search_path = "|".join([path, parameter])
@@ -229,7 +245,7 @@ class Workspace(ManageIQAutomate):
 
     def get_method_parameter(self, dict_options):
         """
-            Get the passed in state_var from the Workspace
+            Get the passed in method_parameter from the Workspace
         """
         return_value = None
 
@@ -241,21 +257,37 @@ class Workspace(ManageIQAutomate):
             self._module.fail_json(msg='Method Parameter %s does not exist' % dict_options['parameter'])
 
     def get_object_names(self):
+        """
+            Get a list of all current object names
+        """
+
         return_value = self._target['workspace']['result']['input']['objects'].keys()
         return dict(changed=False, value=return_value)
 
 
     def get_method_parameters(self):
+        """
+            Get a list of all current method_paramters
+        """
+
         return_value = self._target['workspace']['result']['input']['method_parameters']
         return dict(changed=False, value=return_value)
 
 
     def get_state_var_names(self):
+        """
+            Get a list of all current state_var names
+        """
+
         return_value = self._target['workspace']['result']['input']['state_vars'].keys()
         return dict(changed=False, value=return_value)
 
 
     def get_object_attribute_names(self, dict_options):
+        """
+            Get a list of all object_attribute names
+        """
+
         if self.object_exists(dict_options):
             return_value = self._target['workspace']['result']['input']['objects'][dict_options['object']].keys()
             return dict(changed=False, value=return_value)
@@ -265,7 +297,7 @@ class Workspace(ManageIQAutomate):
 
     def set_state_var(self, dict_options):
         """
-            Set the state_vars called with the passed in value
+            Set the state_var called with the passed in value
         """
 
         new_attribute = dict_options['attribute']
