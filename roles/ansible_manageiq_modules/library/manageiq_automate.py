@@ -138,11 +138,23 @@ class ManageIQAutomate(object):
         return self._api_url + '/' + url_str
 
 
-    def get(self):
+    def href_slug_url(self, value):
+        """
+            The url to connect to the vmdb
+        """
+        base_url = value.split('::')[1]
+        return self._api_url + '/' + base_url
+
+
+    def get(self, alt_url=None):
         """
             Get any attribute, object from the REST API
         """
-        result = self._client.get(self.url())
+        if alt_url:
+            url = alt_url
+        else:
+            url = self.url()
+        result = self._client.get(url)
         return dict(result=result)
 
 
@@ -319,6 +331,21 @@ class Workspace(ManageIQAutomate):
             self._module.fail_json(msg='Object %s does not exist' % dict_options['object'])
 
 
+    def get_vmdb_object(self, dict_options):
+        """
+            Get a vmdb object via an href_slug passed in on an attribute
+        """
+        result = self.get_attribute(dict_options)
+        attribute = dict_options['attribute']
+        obj = dict_options['object']
+        if self.object_exists(dict_options):
+            vmdb_object = self.get(self.href_slug_url(result['value']))
+            return_value = self._target['workspace']['result']['input']['objects'][obj][attribute] = vmdb_object['result']
+            return dict(changed=False, value=return_value)
+        else:
+            self._module.fail_json(msg='Attribute %s does not exist for Object %s' % (attribute, obj))
+
+
     def set_state_var(self, dict_options):
         """
             Set the state_var called with the passed in value
@@ -440,6 +467,7 @@ def main():
                 get_method_parameter=dict(required=False, type='dict'),
                 set_retry=dict(required=False, type='dict'),
                 set_state_var=dict(required=False, type='dict'),
+                get_vmdb_object=dict(required=False, type='dict'),
                 get_object_names=dict(required=False, type='bool'),
                 get_state_var_names=dict(required=False, type='bool'),
                 get_method_parameters=dict(required=False, type='bool'),
@@ -455,6 +483,7 @@ def main():
         'get_method_parameter':module.params['get_method_parameter'],
         'get_state_var':module.params['get_state_var'],
         'get_object_attribute_names':module.params['get_object_attribute_names'],
+        'get_vmdb_object':module.params['get_vmdb_object'],
         'object_exists':module.params['object_exists'],
         'method_parameter_exists':module.params['method_parameter_exists'],
         'attribute_exists':module.params['attribute_exists'],
