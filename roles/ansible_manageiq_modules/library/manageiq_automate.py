@@ -340,8 +340,7 @@ class Workspace(ManageIQAutomate):
         obj = dict_options['object']
         if self.object_exists(dict_options):
             vmdb_object = self.get(self.href_slug_url(result['value']))
-            return_value = self._target['workspace']['result']['input']['objects'][obj][attribute] = vmdb_object['result']
-            return dict(changed=False, value=return_value)
+            return dict(changed=False, value=vmdb_object['result'])
         else:
             self._module.fail_json(msg='Attribute %s does not exist for Object %s' % (attribute, obj))
 
