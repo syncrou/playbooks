@@ -112,6 +112,11 @@
           attribute: "email"
           value:  "fred@gmail.com"
 
+   - name: Grab a vm object
+     manageiq_automate:
+       workspace: "{{ workspace }}"
+       get_vmdb_object: my_vm
+
   post_tasks:
     - name: "Run the post tasks"
       debug: msg="Committing the workspace"

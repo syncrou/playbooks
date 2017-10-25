@@ -33,15 +33,19 @@ module: manageiq_automate
 '''
 import dpath.util
 from ansible.module_utils.basic import AnsibleModule
+
+
 try:
     from manageiq_client.api import ManageIQClient
     HAS_CLIENT = True
 except ImportError:
     HAS_CLIENT = False
 
+
 def check_client(module):
     if not HAS_CLIENT:
         module.fail_json(msg='manageiq_client.api is required for this module')
+
 
 def validate_connection_params(module):
     params = module.params['manageiq_connection']
@@ -56,6 +60,7 @@ def validate_connection_params(module):
     for arg in ['url', 'username', 'password']:
         if params[arg] in (None, ''):
             module.fail_json(msg=error_str.format(arg))
+
 
 class ManageIQ(object):
     """
@@ -160,10 +165,28 @@ class ManageIQAutomate(object):
             return False
 
 
+    def auto_commit(self):
+        """ ManageIQAutomate
+
+        Returns:
+            Boolean auto_commit on or off
+        """
+        return bool(self._target['workspace']['options'].get('auto_commit'))
+
+
 class Workspace(ManageIQAutomate):
     """
         Object to modify and get the Workspace
     """
+
+    def set_or_commit(self):
+        """
+            Commit the workspace or return the current version
+        """
+        if self.auto_commit():
+            return self.commit_workspace()
+        return dict(changed=True, workspace=self._target['workspace'])
+
 
     def object_exists(self, dict_options):
         """
@@ -256,6 +279,7 @@ class Workspace(ManageIQAutomate):
         else:
             self._module.fail_json(msg='Method Parameter %s does not exist' % dict_options['parameter'])
 
+
     def get_object_names(self):
         """
             Get a list of all current object names
@@ -304,7 +328,19 @@ class Workspace(ManageIQAutomate):
         new_value = dict_options['value']
         self._target['workspace']['result']['input']['state_vars'][new_attribute] = new_value
         self._target['workspace']['result']['output']['state_vars'][new_attribute] = new_value
-        return dict(changed=True, workspace=self._target['workspace'])
+        return self.set_or_commit()
+
+
+    def set_retry(self, dict_options):
+        """
+            Set Retry
+        """
+        attributes = dict()
+        attributes['object'] = 'root'
+        attributes['value'] = dict(ae_result='retry', ae_retry_limit=dict_options['interval'])
+
+        self.set_attributes(attributes, 'value')
+        return self.set_or_commit()
 
 
     def set_attribute(self, dict_options):
@@ -319,17 +355,21 @@ class Workspace(ManageIQAutomate):
             self._target['workspace']['result']['input']['objects'][obj][new_attribute] = new_value
             new_dict = {obj:{new_attribute: new_value}}
             self._target['workspace']['result']['output']['objects'] = new_dict
-            return dict(changed=True, workspace=self._target['workspace'])
+            return self.set_or_commit()
         else:
             msg = 'Failed to set the attribute %s with value %s for %s' % (new_attribute, new_value, obj)
             self._module.fail_json(msg=msg, changed=False)
 
 
-    def set_attributes(self, dict_options):
+    def set_attributes(self, dict_options, alt_key=None):
         """
             Set the attributes called on the object with the passed in values
         """
-        new_attributes = dict_options['attributes']
+        if alt_key:
+            new_attributes = dict_options[alt_key]
+        else:
+            new_attributes = dict_options['attributes']
+
         obj = dict_options['object']
         if self.object_exists(dict_options):
             for new_attribute, new_value in new_attributes.iteritems():
@@ -337,7 +377,7 @@ class Workspace(ManageIQAutomate):
                 if self._target['workspace']['result']['output']['objects'].get(obj) is None:
                     self._target['workspace']['result']['output']['objects'][obj] = dict()
                 self._target['workspace']['result']['output']['objects'][obj][new_attribute] = new_value
-            return dict(changed=True, workspace=self._target['workspace'])
+            return self.set_or_commit()
         else:
             msg = 'Failed to set the attributes %s for %s' % (new_attributes, obj)
             self._module.fail_json(msg=msg, changed=False)
@@ -351,39 +391,13 @@ class Workspace(ManageIQAutomate):
         return dict(changed=True, workspace=workspace)
 
 
-    def commit_attribute(self, dict_options):
+    def initialize_workspace(self, dict_options):
         """
-            Commit the attribute called on the object with the passed in value
-        """
-        workspace = self.set_attribute(dict_options)
-        self.commit_workspace()
-        return workspace
-
-
-    def commit_attributes(self, dict_options):
-        """
-            Commit the attributes called on the object with the passed in values
-        """
-        workspace = self.set_attributes(dict_options)
-        self.commit_workspace()
-        return workspace
-
-
-    def commit_state_var(self, dict_options):
-        """
-            Commit the state_var called on the object with the passed in value
-        """
-        workspace = self.set_state_var(dict_options)
-        self.commit_workspace()
-        return workspace
-
-
-    def get_workspace(self):
-        """
-            Get the entire Workspace
+            Initialize the Workspace with auto_commit set to true or false
         """
 
         workspace = self.get()
+        workspace['options'] = dict(auto_commit=(dict_options.get('auto_commit') or False))
         workspace['result']['output'] = dict()
         workspace['result']['output']['objects'] = dict()
         workspace['result']['output']['state_vars'] = dict()
@@ -413,7 +427,7 @@ def main():
             argument_spec=dict(
                 manageiq_connection=dict(required=True, type='dict',
                                          options=manageiq_argument_spec()),
-                get_workspace=dict(type='bool', default=False),
+                initialize_workspace=dict(required=False, type='dict'),
                 commit_workspace=dict(type='bool', default=False),
                 set_attribute=dict(required=False, type='dict'),
                 set_attributes=dict(required=False, type='dict'),
@@ -427,6 +441,7 @@ def main():
                 get_attribute=dict(required=False, type='dict'),
                 get_state_var=dict(required=False, type='dict'),
                 get_method_parameter=dict(required=False, type='dict'),
+                set_retry=dict(required=False, type='dict'),
                 set_state_var=dict(required=False, type='dict'),
                 get_object_names=dict(required=False, type='bool'),
                 get_state_var_names=dict(required=False, type='bool'),
@@ -437,6 +452,8 @@ def main():
             )
 
     argument_opts = {
+        'initialize_workspace':module.params['initialize_workspace'],
+        'commit_workspace':module.params['commit_workspace'],
         'get_attribute':module.params['get_attribute'],
         'get_method_parameter':module.params['get_method_parameter'],
         'get_state_var':module.params['get_state_var'],
@@ -447,16 +464,12 @@ def main():
         'state_var_exists':module.params['state_var_exists'],
         'set_attribute':module.params['set_attribute'],
         'set_attributes':module.params['set_attributes'],
-        'set_state_var':module.params['set_state_var'],
-        'commit_attribute':module.params['commit_attribute'],
-        'commit_attributes':module.params['commit_attributes'],
-        'commit_state_var':module.params['commit_state_var'],
+        'set_retry':module.params['set_retry'],
+        'set_state_var':module.params['set_state_var']
         }
 
     boolean_opts = {
         'get_object_names':module.params['get_object_names'],
-        'commit_workspace':module.params['commit_workspace'],
-        'get_workspace':module.params['get_workspace'],
         'get_method_parameters':module.params['get_method_parameters'],
         'get_state_var_names':module.params['get_state_var_names']
         }

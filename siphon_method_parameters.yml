@@ -3,7 +3,8 @@
   hosts: localhost
   connection: local
   vars:
-    - object: root
+  - object: root
+  - interval: 600
 
   gather_facts: False
   roles:
@@ -17,9 +18,15 @@
         get_method_parameters: yes
       register: method_params
 
-    - name: "Commit a set of attributes"
+    - name: "Set attributes"
       manageiq_automate:
         workspace: "{{ workspace }}"
-        commit_attributes:
+        set_attributes:
           object: "{{ object }}"
           attributes: "{{ method_params.value }}"
+    
+    - name: Set Retry
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        set_retry:
+          interval: "{{ interval }}"
