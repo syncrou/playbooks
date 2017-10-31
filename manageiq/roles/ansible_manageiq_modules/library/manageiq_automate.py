@@ -165,6 +165,19 @@ class ManageIQAutomate(object):
         result = self._client.post(self.url(), action='edit', resource=data)
         return  result
 
+    def encrypt(self, data):
+        """
+            Set any attribute, object from the REST API
+        """
+        result = self._client.post(self.url(), action='encrypt', resource=data)
+        return  result
+
+    def decrypt(self, data):
+        """
+            Decrypt any attribute, object from the REST API
+        """
+        result = self._client.post(self.url(), action='decrypt', resource=data)
+        return  result
 
     def exists(self, path):
         """
@@ -191,6 +204,13 @@ class Workspace(ManageIQAutomate):
         Object to modify and get the Workspace
     """
 
+    def current(self):
+        current_path = '/' + self._target['workspace']['current']['namespace'] + '/'
+        self._target['workspace']['current']['class'] + '/'
+        self._target['workspace']['current']['instance']
+        return current_path
+
+
     def set_or_commit(self):
         """
             Commit the workspace or return the current version
@@ -199,13 +219,20 @@ class Workspace(ManageIQAutomate):
             return self.commit_workspace()
         return dict(changed=True, workspace=self._target['workspace'])
 
+    def get_real_object_name(self, dict_options):
+        if dict_options['object'] == 'current':
+            return self.current()
+        return dict_options['object']
+
+
 
     def object_exists(self, dict_options):
         """
             Check if the specific object exists
         """
 
-        search_path = "workspace|result|input|objects|" + dict_options['object']
+        search_path = "workspace|result|input|objects|" + self.get_real_object_name(dict_options)
+
         if self.exists(search_path):
             return dict(changed=False, value=True)
         return dict(changed=False, value=False)
@@ -216,7 +243,7 @@ class Workspace(ManageIQAutomate):
             Check if the specific attribute exists
         """
 
-        obj = dict_options['object']
+        obj = self.get_real_object_name(dict_options)
         attribute = dict_options['attribute']
         path = "workspace|result|input|objects"
         search_path = "|".join([path, obj, attribute])
@@ -249,6 +276,17 @@ class Workspace(ManageIQAutomate):
         if self.exists(search_path):
             return dict(changed=False, value=True)
         return dict(changed=False, value=False)
+
+
+    def get_decrypted_attribute(self, dict_options):
+        decrypted_attribute = self.decrypt(dict_options)
+        return dict(changed=False, value=decrypted_attribute)
+
+
+    def get_decrypted_method_parameter(self, dict_options):
+        decrypted_dict = dict(object='method_parameters', attribute=dict_options['attribute'])
+        decrypted_attribute = self.decrypt(decrypted_dict)
+        return dict(changed=False, value=decrypted_attribute)
 
 
     def get_attribute(self, dict_options):
@@ -369,6 +407,11 @@ class Workspace(ManageIQAutomate):
         return self.set_or_commit()
 
 
+    def set_encrypted_attribute(self, dict_options):
+        encrypted_attribute = self.encrypt(dict_options)
+        return dict(changed=True, value=encrypted_attribute)
+
+
     def set_attribute(self, dict_options):
         """
             Set the attribute called on the object with the passed in value
@@ -376,7 +419,7 @@ class Workspace(ManageIQAutomate):
 
         new_attribute = dict_options['attribute']
         new_value = dict_options['value']
-        obj = dict_options['object']
+        obj = self.get_real_object_name(dict_options)
         if self.object_exists(dict_options):
             self._target['workspace']['result']['input']['objects'][obj][new_attribute] = new_value
             new_dict = {obj:{new_attribute: new_value}}
@@ -432,7 +475,7 @@ def manageiq_argument_spec():
     return dict(
         url=dict(default=os.environ.get('MIQ_URL', None)),
         username=dict(default=os.environ.get('MIQ_USERNAME', None)),
-        password=dict(default=os.environ.get('MIQ_PASSWORD', None), no_log=True),
+        password=dict(default=os.environ.get('MIQ_PASSWORD', None), no_log=False),
         token=dict(default=os.environ.get('MIQ_TOKEN', None), no_log=True),
         automate_workspace=dict(default=None, type='str', no_log=True),
         group=dict(default=None, type='str'),
@@ -466,7 +509,10 @@ def main():
                 get_method_parameter=dict(required=False, type='dict'),
                 set_retry=dict(required=False, type='dict'),
                 set_state_var=dict(required=False, type='dict'),
+                set_encrypted_attribute=dict(required=False, type='dict'),
                 get_vmdb_object=dict(required=False, type='dict'),
+                get_decrypted_attribute=dict(required=False, type='dict'),
+                get_decrypted_method_parameter=dict(required=False, type='dict'),
                 get_object_names=dict(required=False, type='bool'),
                 get_state_var_names=dict(required=False, type='bool'),
                 get_method_parameters=dict(required=False, type='bool'),
@@ -483,12 +529,15 @@ def main():
         'get_state_var':module.params['get_state_var'],
         'get_object_attribute_names':module.params['get_object_attribute_names'],
         'get_vmdb_object':module.params['get_vmdb_object'],
+        'get_decrypted_attribute':module.params['get_decrypted_attribute'],
+        'get_decrypted_method_parameter':module.params['get_decrypted_method_parameter'],
         'object_exists':module.params['object_exists'],
         'method_parameter_exists':module.params['method_parameter_exists'],
         'attribute_exists':module.params['attribute_exists'],
         'state_var_exists':module.params['state_var_exists'],
         'set_attribute':module.params['set_attribute'],
         'set_attributes':module.params['set_attributes'],
+        'set_encrypted_attribute':module.params['set_encrypted_attribute'],
         'set_retry':module.params['set_retry'],
         'set_state_var':module.params['set_state_var']
         }

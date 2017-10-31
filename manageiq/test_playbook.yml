@@ -2,6 +2,8 @@
 - name: Try out any module or role
   hosts: localhost
   connection: local
+  vars:
+    #- auto_commit: true
 
   gather_facts: False
   roles:
@@ -104,8 +106,38 @@
           object: root
           attribute: miq_group
 
-    #post_tasks:
-    #- name: "Run the post tasks"
-    #  debug: msg="Committing the workspace"
-    #  changed_when: true
-    #  notify: "Commit the Workspace"
+    - name: Decrypt an attribute from an object
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        get_decrypted_attribute:
+          object: root
+          attribute: fred
+      register: decrypted_attribute
+      tags: decrypt
+
+    - debug: msg=decrypted_attribute
+
+    - name: Decrypt a method_parameter from an object
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        get_decrypted_method_parameter:
+          attribute: fred
+      tags: decrypt
+
+    - name: Encrypt an object attribute
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        set_encrypted_attribute:
+          object: root
+          attribute: freddy
+          value: 'smartvm'
+      tags: decrypt
+
+    - name: "Set another attribute"
+      manageiq_automate:
+        workspace: "{{ workspace }}"
+        set_attribute:
+          object: "root"
+          attribute: "clear_text"
+          value:  "{{ decrypted_attribute.value.value }}"
+      tags: decrypt
