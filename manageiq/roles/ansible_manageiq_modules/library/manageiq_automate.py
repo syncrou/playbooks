@@ -155,7 +155,7 @@ class ManageIQAutomate(object):
         else:
             url = self.url()
         result = self._client.get(url)
-        return dict(result=result)
+        return dict(result)
 
 
     def set(self, data):
@@ -295,7 +295,7 @@ class Workspace(ManageIQAutomate):
         """
 
         if self.attribute_exists(dict_options):
-            return_value = self._target['workspace']['result']['input']['objects'][dict_options['object']][dict_options['attribute']]
+            return_value = self._target['workspace']['input']['objects'][dict_options['object']][dict_options['attribute']]
 
             return dict(changed=False, value=return_value)
         else:
@@ -309,7 +309,7 @@ class Workspace(ManageIQAutomate):
         return_value = None
 
         if self.state_var_exists(dict_options):
-            return_value = self._target['workspace']['result']['input']['state_vars'][dict_options['attribute']]
+            return_value = self._target['workspace']['input']['state_vars'][dict_options['attribute']]
 
             return dict(changed=False, value=return_value)
         else:
@@ -323,7 +323,7 @@ class Workspace(ManageIQAutomate):
         return_value = None
 
         if self.method_parameter_exists(dict_options):
-            return_value = self._target['workspace']['result']['input']['method_parameters'][dict_options['parameter']]
+            return_value = self._target['workspace']['input']['method_parameters'][dict_options['parameter']]
 
             return dict(changed=False, value=return_value)
         else:
@@ -335,7 +335,7 @@ class Workspace(ManageIQAutomate):
             Get a list of all current object names
         """
 
-        return_value = self._target['workspace']['result']['input']['objects'].keys()
+        return_value = self._target['workspace']['input']['objects'].keys()
         return dict(changed=False, value=return_value)
 
 
@@ -344,7 +344,7 @@ class Workspace(ManageIQAutomate):
             Get a list of all current method_paramters
         """
 
-        return_value = self._target['workspace']['result']['input']['method_parameters']
+        return_value = self._target['workspace']['input']['method_parameters']
         return dict(changed=False, value=return_value)
 
 
@@ -353,7 +353,7 @@ class Workspace(ManageIQAutomate):
             Get a list of all current state_var names
         """
 
-        return_value = self._target['workspace']['result']['input']['state_vars'].keys()
+        return_value = self._target['workspace']['input']['state_vars'].keys()
         return dict(changed=False, value=return_value)
 
 
@@ -363,7 +363,7 @@ class Workspace(ManageIQAutomate):
         """
 
         if self.object_exists(dict_options):
-            return_value = self._target['workspace']['result']['input']['objects'][dict_options['object']].keys()
+            return_value = self._target['workspace']['input']['objects'][dict_options['object']].keys()
             return dict(changed=False, value=return_value)
         else:
             self._module.fail_json(msg='Object %s does not exist' % dict_options['object'])
@@ -378,7 +378,7 @@ class Workspace(ManageIQAutomate):
         obj = dict_options['object']
         if self.object_exists(dict_options):
             vmdb_object = self.get(self.href_slug_url(result['value']))
-            return dict(changed=False, value=vmdb_object['result'])
+            return dict(changed=False, value=vmdb_object)
         else:
             self._module.fail_json(msg='Attribute %s does not exist for Object %s' % (attribute, obj))
 
@@ -390,8 +390,8 @@ class Workspace(ManageIQAutomate):
 
         new_attribute = dict_options['attribute']
         new_value = dict_options['value']
-        self._target['workspace']['result']['input']['state_vars'][new_attribute] = new_value
-        self._target['workspace']['result']['output']['state_vars'][new_attribute] = new_value
+        self._target['workspace']['input']['state_vars'][new_attribute] = new_value
+        self._target['workspace']['output']['state_vars'][new_attribute] = new_value
         return self.set_or_commit()
 
 
@@ -421,9 +421,9 @@ class Workspace(ManageIQAutomate):
         new_value = dict_options['value']
         obj = self.get_real_object_name(dict_options)
         if self.object_exists(dict_options):
-            self._target['workspace']['result']['input']['objects'][obj][new_attribute] = new_value
+            self._target['workspace']['input']['objects'][obj][new_attribute] = new_value
             new_dict = {obj:{new_attribute: new_value}}
-            self._target['workspace']['result']['output']['objects'] = new_dict
+            self._target['workspace']['output']['objects'] = new_dict
             return self.set_or_commit()
         else:
             msg = 'Failed to set the attribute %s with value %s for %s' % (new_attribute, new_value, obj)
@@ -439,10 +439,10 @@ class Workspace(ManageIQAutomate):
         obj = dict_options['object']
         if self.object_exists(dict_options):
             for new_attribute, new_value in new_attributes.iteritems():
-                self._target['workspace']['result']['input']['objects'][obj][new_attribute] = new_value
-                if self._target['workspace']['result']['output']['objects'].get(obj) is None:
-                    self._target['workspace']['result']['output']['objects'][obj] = dict()
-                self._target['workspace']['result']['output']['objects'][obj][new_attribute] = new_value
+                self._target['workspace']['input']['objects'][obj][new_attribute] = new_value
+                if self._target['workspace']['output']['objects'].get(obj) is None:
+                    self._target['workspace']['output']['objects'][obj] = dict()
+                self._target['workspace']['output']['objects'][obj][new_attribute] = new_value
             return self.set_or_commit()
         else:
             msg = 'Failed to set the attributes %s for %s' % (new_attributes, obj)
@@ -453,7 +453,7 @@ class Workspace(ManageIQAutomate):
         """
             Commit the workspace
         """
-        workspace = self.set(self._target['workspace']['result']['output'])
+        workspace = self.set(self._target['workspace']['output'])
         return dict(changed=True, workspace=workspace)
 
 
@@ -464,9 +464,7 @@ class Workspace(ManageIQAutomate):
 
         workspace = self.get()
         workspace['options'] = dict(auto_commit=(dict_options.get('auto_commit') or False))
-        workspace['result']['output'] = dict()
-        workspace['result']['output']['objects'] = dict()
-        workspace['result']['output']['state_vars'] = dict()
+        workspace['output'] = dict(objects=dict(), state_vars=dict())
 
         return dict(changed=False, workspace=workspace)
 
