@@ -3,7 +3,7 @@
   hosts: localhost
   connection: local
   vars:
-    #- auto_commit: true
+    - auto_commit: true
 
   gather_facts: False
   roles:

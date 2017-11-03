@@ -165,6 +165,7 @@ class ManageIQAutomate(object):
         result = self._client.post(self.url(), action='edit', resource=data)
         return  result
 
+
     def encrypt(self, data):
         """
             Set any attribute, object from the REST API
@@ -172,12 +173,14 @@ class ManageIQAutomate(object):
         result = self._client.post(self.url(), action='encrypt', resource=data)
         return  result
 
+
     def decrypt(self, data):
         """
             Decrypt any attribute, object from the REST API
         """
         result = self._client.post(self.url(), action='decrypt', resource=data)
         return  result
+
 
     def exists(self, path):
         """
@@ -219,11 +222,11 @@ class Workspace(ManageIQAutomate):
             return self.commit_workspace()
         return dict(changed=True, workspace=self._target['workspace'])
 
+
     def get_real_object_name(self, dict_options):
         if dict_options['object'] == 'current':
             return self.current()
         return dict_options['object']
-
 
 
     def object_exists(self, dict_options):
@@ -451,9 +454,12 @@ class Workspace(ManageIQAutomate):
 
     def commit_workspace(self):
         """
-            Commit the workspace
+            Commit the workspace and re apply the auto_commit options
         """
+        auto_commit_dict = self._target['workspace'].get('options')
         workspace = self.set(self._target['workspace']['output'])
+        if 'options' not in workspace.keys():
+            workspace['options'] = auto_commit_dict
         return dict(changed=True, workspace=workspace)
 
 
@@ -473,7 +479,7 @@ def manageiq_argument_spec():
     return dict(
         url=dict(default=os.environ.get('MIQ_URL', None)),
         username=dict(default=os.environ.get('MIQ_USERNAME', None)),
-        password=dict(default=os.environ.get('MIQ_PASSWORD', None), no_log=False),
+        password=dict(default=os.environ.get('MIQ_PASSWORD', None), no_log=True),
         token=dict(default=os.environ.get('MIQ_TOKEN', None), no_log=True),
         automate_workspace=dict(default=None, type='str', no_log=True),
         group=dict(default=None, type='str'),
