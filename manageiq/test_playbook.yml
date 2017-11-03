@@ -7,8 +7,7 @@
 
   gather_facts: False
   roles:
-  - ansible_manageiq_modules
-  - ansible_manageiq
+  - manageiq_automate
 
   tasks:
     - name: "Check an attribute"
@@ -113,7 +112,6 @@
           object: root
           attribute: fred
       register: decrypted_attribute
-      tags: decrypt
 
     - debug: msg=decrypted_attribute
 
@@ -122,7 +120,6 @@
         workspace: "{{ workspace }}"
         get_decrypted_method_parameter:
           attribute: fred
-      tags: decrypt
 
     - name: Encrypt an object attribute
       manageiq_automate:
@@ -131,7 +128,6 @@
           object: root
           attribute: freddy
           value: 'smartvm'
-      tags: decrypt
 
     - name: "Set another attribute"
       manageiq_automate:
@@ -140,4 +136,3 @@
           object: "root"
           attribute: "clear_text"
           value:  "{{ decrypted_attribute.value.value }}"
-      tags: decrypt

@@ -8,8 +8,7 @@
 
   gather_facts: False
   roles:
-  - ansible_manageiq_modules
-  - ansible_manageiq
+  - manageiq_automate
 
   tasks:
     - name: "Get the list of Method Parameters"

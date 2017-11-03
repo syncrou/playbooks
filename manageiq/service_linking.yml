@@ -3,12 +3,9 @@
   hosts: localhost
   connection: local
 
-  environment:
-    PYTHONPATH: "/usr/local/lib/python2.7/site-packages:$PYTHONPATH"
   gather_facts: False
   roles:
-  - ansible_manageiq
-  - ansible_manageiq_modules
+  - manageiq_vmdb
 
   pre_tasks:
     - name: "Run the pre tasks"

@@ -12,4 +12,4 @@
     initialize_workspace: 
       auto_commit: "{{ auto_commit }}"
   register: workspace
-  tags: decrypt
+  tags: blah
