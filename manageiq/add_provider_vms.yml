@@ -19,16 +19,17 @@
             - vm2
             - vm3
           provider: 1223
+      tags: action
 
     - name: Get vmdb_object
       manageiq_vmdb:
-        get_vmdb_object:
-        href: "services/80"
+        get_object:
+        href: "services/80" # More like a class method
       register: vmdb_object
 
     - name: Service Linking
       manageiq_vmdb:
-        vmdb: "{{ vmdb_object }}"
+        vmdb: "{{ vmdb_object }}" # More like an instance method
         action: add_provider_vms
         data: 
           vms: 
@@ -39,6 +40,6 @@
 
     - name: Get vmdb_object
       manageiq_vmdb:
-        get_vmdb_object:
+        get_object:
         href: "https://localhost:3000/api/services/80"
       register: vmdb_object
