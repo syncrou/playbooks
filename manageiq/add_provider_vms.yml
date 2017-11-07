@@ -13,12 +13,13 @@
       manageiq_vmdb:
         href: "services/80"
         action: add_provider_vms
-        data: 
-          vms: 
-            - vm1
-            - vm2
-            - vm3
-          provider: 1223
+        data:
+          uid_ems:
+            - vm1-234234234
+            - vm2-ada987987
+            - vm3-324lkjsdf
+          provider:
+            id: 15
       tags: action
 
     - name: Get vmdb_object
@@ -36,7 +37,7 @@
             - vm1
             - vm2
             - vm3
-          provider: 1223
+          provider: 15
 
     - name: Get vmdb_object
       manageiq_vmdb:

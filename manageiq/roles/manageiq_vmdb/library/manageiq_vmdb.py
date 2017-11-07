@@ -186,7 +186,7 @@ class Vmdb(ManageIQVmdb):
         if self.exists(action_string):
             data = self._module.params['data']
             result = self._client.post(self.post_url, action=action_string, resource=data)
-            if result['success'] == 'true':
+            if result['success']:
                 return dict(changed=False, value=result)
             return self._module.fail_json(msg=result['message'])
         return self._module.fail_json(msg="Action not found")
