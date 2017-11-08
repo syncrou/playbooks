@@ -32,6 +32,9 @@
 - hosts: staging
   gather_facts: True
   tasks:
+  - debug:
+      var: hostvars['prod']['mydate']
+
   - name: Fetch the database file and dump it into Dropbox
     fetch:
       src: "{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
