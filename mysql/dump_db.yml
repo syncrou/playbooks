@@ -35,7 +35,7 @@
     tags: 
       mysql
 
-- hosts: localhost
+- hosts: staging
   gather_facts: True
   tasks:
   - name: Only keep the 2 newest files on Dropbox (Linux)
