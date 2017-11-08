@@ -33,7 +33,7 @@
 - hosts: staging
   gather_facts: True
   tasks:
-  - debug: var=hostvars['107.170.125.164']['mydate']
+  - set_fact: mydate="{{hostvars['107.170.125.164']['mydate']}}"
 
   - name: Fetch the database file and dump it into Dropbox
     fetch:
