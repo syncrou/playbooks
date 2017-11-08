@@ -38,16 +38,9 @@
 - hosts: staging
   gather_facts: True
   tasks:
-  - name: Only keep the 2 newest files on Dropbox (Linux)
+  - name: Only keep the 2 newest files on Dropbox
     raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | xargs -d '\n' rm --"
-    when: ansible_os_family == 'Debian'
     tags:
-      mysql
-
-  - name: Only keep the 2 newest files on Dropbox (OSX)
-    raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | gxargs -d '\n' rm --"
-    when: ansible_os_family == 'Darwin'
-    tags: 
       mysql
 
   - name: Clone the master branch to Dropbox
