@@ -5,8 +5,8 @@
 #   Grab the latest version of master from GitHub and save that on Dropbox
 - hosts: prod
   gather_facts: False
+  vars: mydate="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
   tasks:
-  - set_fact: mydate="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
     tags: config
 
   - debug: var=mydate
