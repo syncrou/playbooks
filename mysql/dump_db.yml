@@ -6,13 +6,6 @@
 - hosts: prod
   gather_facts: False
   tasks:
-  - name: Pull in the db vars
-    include_vars:
-      file: secrets.yml
-      name: secret
-    tags:
-      config
-
   - set_fact: mydate="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
     tags: config
 
@@ -45,12 +38,6 @@
 - hosts: localhost
   gather_facts: True
   tasks:
-  - name: Localhost changes
-    include_vars:
-      file: secrets.yml
-      name: secret
-    tags: config
-
   - name: Only keep the 2 newest files on Dropbox (Linux)
     raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | xargs -d '\n' rm --"
     when: ansible_os_family == 'Debian'
