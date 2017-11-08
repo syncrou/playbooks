@@ -8,7 +8,8 @@
   vars:
     mydate: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
   tasks:
-  - debug: var=mydate
+  - debug:
+      msg: "Current Date: {{ mydate }}"
     tags: config
 
   - name: "Dump the {{ secret.db_name }} database to {{ secret.db_name }}_{{ mydate }}.sql"
