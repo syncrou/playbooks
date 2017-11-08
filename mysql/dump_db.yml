@@ -8,8 +8,6 @@
   vars:
     mydate: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
   tasks:
-    tags: config
-
   - debug: var=mydate
     tags: config
 
