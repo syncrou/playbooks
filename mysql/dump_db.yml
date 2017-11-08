@@ -6,7 +6,7 @@
 - hosts: prod
   gather_facts: False
   vars:
-  - mydate: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+    mydate: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
   tasks:
     tags: config
 
