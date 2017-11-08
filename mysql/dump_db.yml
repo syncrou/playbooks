@@ -5,12 +5,13 @@
 #   Grab the latest version of master from GitHub and save that on Dropbox
 - hosts: prod
   gather_facts: False
-  vars:
-    mydate: "{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
   tasks:
+  - set_fact: mydate="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
   - debug:
       msg: "Current Date: {{ mydate }}"
     tags: config
+
 
   - name: "Dump the {{ secret.db_name }} database to {{ secret.db_name }}_{{ mydate }}.sql"
     mysql_db:
@@ -32,8 +33,7 @@
 - hosts: staging
   gather_facts: True
   tasks:
-  - debug:
-      var: hostvars['prod']['mydate']
+  - debug: var=hostvars['107.170.125.164']['mydate']
 
   - name: Fetch the database file and dump it into Dropbox
     fetch:
