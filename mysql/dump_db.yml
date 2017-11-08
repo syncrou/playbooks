@@ -37,7 +37,7 @@
 
   - name: Fetch the database file and dump it into Dropbox
     fetch:
-      src: "{{ secret.remote_folder }}onramp_{{ mydate }}.sql"
+      src: "{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
       dest: "{{ secret.local_folder }}"
     tags: 
       mysql
