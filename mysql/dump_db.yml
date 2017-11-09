@@ -29,19 +29,19 @@
     tags: 
       mysql
 
+  - synchronize:
+      mode: push
+      src: "{{ secret.remote_folder }}{{ secret.db_name }}_{{ mydate }}.sql"
+      dest: "rsync://{{secret.hostname}}{{ secret.local_folder_combined }}"
+      dest_port: 3422
+    tags: mysql
+
+
 
 - hosts: staging
   gather_facts: True
   tasks:
   - set_fact: mydate="{{hostvars['107.170.125.164']['mydate']}}"
-
-  - synchronize:
-      mode: pull
-      src: "rsync://{{secret.ip}}{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
-      dest: "{{ secret.local_folder }}"
-      dest_port: 3422
-    delegate_to: "{{secret.ip}}"
-    tags: mysql
 
   - name: Only keep the 2 newest files on Dropbox
     raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | xargs -d '\n' rm --"
