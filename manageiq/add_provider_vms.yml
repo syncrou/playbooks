@@ -2,33 +2,55 @@
 - name: Service Linking VM's to an existing service
   hosts: localhost
   connection: local
-  vars:
-
   gather_facts: False
+
+  vars:
+  - key: db
+  - name: db-test-provision-6
+  - instance_type: t2.nano
+  - security_group: sg-dfe6c6a6
+  - image: ami-60b6c60a
+  - region: us-east-1
+  - subnet: subnet-f849ff96
+
   roles:
   - manageiq_vmdb
 
   tasks:
-    - name: Service Linking via an href slug
-      manageiq_vmdb:
-        vmdb: "href_slug::services/80"
-        action: add_provider_vms
-        data:
-          uid_ems:
-            - vm1-234234234
-            - vm2-ada987987
-            - vm3-324lkjsdf
-          provider:
-            id: 15
+  - name: Create Ec2 Instance
+    ec2:
+      key_name: "{{ key }}"
+      instance_tags: {Name: "{{ name }}"}
+      group_id: "{{ security_group }}"
+      instance_type: "{{ instance_type }}"
+      region: "{{ region }}"
+      image: "{{ image }}"
+      wait: yes
+      count: 1
+      vpc_subnet_id: "{{ subnet }}"
+      assign_public_ip: yes
+    register: ec2
 
-    - name: Service Linking via and endpoint
-      manageiq_vmdb:
-        vmdb: "services/80"
-        action: add_provider_vms
-        data:
-          uid_ems:
-            - vm1-sdfsdf908
-            - vm2-234lkj
-            - vm3-987dfs23
-          provider:
-            id: 15
+  - debug: var=ec2
+
+  - name: Service Linking via an href slug
+    manageiq_vmdb:
+      vmdb: "href_slug::services/80"
+      action: add_provider_vms
+      data:
+        uid_ems:
+          - "{{ ec2.instances[0].id }}"
+        provider:
+          id: 26
+
+  - name: Service Linking via and endpoint
+    manageiq_vmdb:
+      vmdb: "services/80"
+      action: add_provider_vms
+      data:
+        uid_ems:
+          - vm1-sdfsdf908
+          - vm2-234lkj
+          - vm3-987dfs23
+        provider:
+          id: 26
