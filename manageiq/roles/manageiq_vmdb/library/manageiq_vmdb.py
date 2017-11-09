@@ -29,7 +29,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 
 DOCUMENTATION = '''
-module: manageiq_automate
+module: manageiq_vmdb
 '''
 import dpath.util
 from ansible.module_utils.basic import AnsibleModule
@@ -124,9 +124,19 @@ class ManageIQVmdb(object):
         self._manageiq = manageiq
         self._module = self._manageiq.module
         self._api_url = self._manageiq.api_url
-        self._href = self._manageiq.module.params['href']
+        self._vmdb = self._manageiq.module.params['vmdb']
+        self._href = None
         self._client = self._manageiq.client
         self._error = None
+
+
+    @property
+    def slug_url(self, value):
+        """
+            The url to connect to the vmdb after parsed from the slug
+        """
+        base_url = value.split('::')[1]
+        return self._api_url + '/' + base_url
 
     @property
     def url(self):
@@ -134,7 +144,6 @@ class ManageIQVmdb(object):
             The url to connect to the VMDB Object
         """
         return self._api_url
-
 
     @property
     def post_url(self):
@@ -149,20 +158,32 @@ class ManageIQVmdb(object):
             Get any attribute, object from the REST API
         """
         if alt_url:
-            url = self.url + '/' + alt_url
+            url = alt_url
         else:
             url = self.url
         result = self._client.get(url)
         return dict(result)
 
 
+    def parse(self, item):
+        """
+            Read what is passed in and return either the dictionary or the url string
+        """
+        if isinstance(item, dict):
+            self._href = "services/" + item['id']
+        elif isinstance(item, str):
+            slug = item.split("::")
+            if len(slug) == 2:
+                self._href = slug[1]
+                return
+            self._href = item
+
 
     def exists(self, path):
         """
             Validate all passed objects before attempting to set or get values from them
         """
-
-        result = self.get(self._href)
+        result = self.get(self.post_url)
         actions = [d['name'] for d in result['actions']]
         return bool(path in actions)
 
@@ -173,26 +194,21 @@ class Vmdb(ManageIQVmdb):
     """
 
 
-    @classmethod
-    def get_action(cls):
-        return cls.action
-
-
-    def action(self, action_string):
+    def action(self, vmdb):
         """
             Call an action if it exists
         """
-        # If we can find this action then post to it
+
+        self.parse(vmdb)
+        data = self._module.params['data']
+        action_string = self._module.params.get('action')
+
         if self.exists(action_string):
-            data = self._module.params['data']
             result = self._client.post(self.post_url, action=action_string, resource=data)
             if result['success']:
                 return dict(changed=False, value=result)
             return self._module.fail_json(msg=result['message'])
         return self._module.fail_json(msg="Action not found")
-
-
-
 
 
 def manageiq_argument_spec():
@@ -217,7 +233,7 @@ def main():
             argument_spec=dict(
                 manageiq_connection=dict(required=True, type='dict',
                                          options=manageiq_argument_spec()),
-                href=dict(required=False, type='str'),
+                vmdb=dict(required=True),
                 action=dict(required=False, type='str'),
                 data=dict(required=False, type='dict')
                 ),
@@ -228,7 +244,7 @@ def main():
     vmdb = Vmdb(manageiq)
 
     if module.params.get('action'):
-        result = vmdb.action(module.params['action'])
+        result = vmdb.action(module.params['vmdb'])
         module.exit_json(**result)
 
     module.fail_json(msg="No VMDB object found")

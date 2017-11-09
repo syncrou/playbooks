@@ -1,5 +1,5 @@
 ---
-- name: Siphon Method Parameters into an object
+- name: Service Linking VM's to an existing service
   hosts: localhost
   connection: local
   vars:
@@ -9,9 +9,9 @@
   - manageiq_vmdb
 
   tasks:
-    - name: Service Linking
+    - name: Service Linking via an href slug
       manageiq_vmdb:
-        href: "services/80"
+        vmdb: "href_slug::services/80"
         action: add_provider_vms
         data:
           uid_ems:
@@ -20,27 +20,15 @@
             - vm3-324lkjsdf
           provider:
             id: 15
-      tags: action
 
-    - name: Get vmdb_object
+    - name: Service Linking via and endpoint
       manageiq_vmdb:
-        get_object:
-        href: "services/80" # More like a class method
-      register: vmdb_object
-
-    - name: Service Linking
-      manageiq_vmdb:
-        vmdb: "{{ vmdb_object }}" # More like an instance method
+        vmdb: "services/80"
         action: add_provider_vms
-        data: 
-          vms: 
-            - vm1
-            - vm2
-            - vm3
-          provider: 15
-
-    - name: Get vmdb_object
-      manageiq_vmdb:
-        get_object:
-        href: "https://localhost:3000/api/services/80"
-      register: vmdb_object
+        data:
+          uid_ems:
+            - vm1-sdfsdf908
+            - vm2-234lkj
+            - vm3-987dfs23
+          provider:
+            id: 15
