@@ -48,7 +48,7 @@
         provider:
           id: 24
 
-  - name: Service Linking via a dict
+  - name: Service Linking via an object
     manageiq_vmdb:
       vmdb: "{{ vmdb_object }}"
       action: add_provider_vms
