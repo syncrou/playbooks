@@ -37,9 +37,9 @@
 
   - synchronize:
       mode: pull
-      src: "rsync://secret.ip{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
+      src: "rsync://centuryd@{{secret.ip}}{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
       dest: "{{ secret.local_folder }}"
-    delegate_to: staging
+    delegate_to: "{{secret.ip}}"
     tags: mysql
 
   - name: Only keep the 2 newest files on Dropbox
