@@ -39,7 +39,7 @@
       mode: pull
       src: "rsync://secret.ip{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
       dest: "{{ secret.local_folder }}"
-    delegate_to: delegate.host
+    delegate_to: staging
     tags: mysql
 
   - name: Only keep the 2 newest files on Dropbox
