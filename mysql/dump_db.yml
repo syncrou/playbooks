@@ -35,12 +35,12 @@
   tasks:
   - set_fact: mydate="{{hostvars['107.170.125.164']['mydate']}}"
 
-  - name: Fetch the database file and dump it into Dropbox
-    fetch:
-      src: "{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
+  - synchronize:
+      mode: pull
+      src: "rsync://secret.ip{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
       dest: "{{ secret.local_folder }}"
-    tags: 
-      mysql
+    delegate_to: delegate.host
+    tags: mysql
 
   - name: Only keep the 2 newest files on Dropbox
     raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | xargs -d '\n' rm --"
