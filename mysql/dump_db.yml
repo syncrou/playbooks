@@ -37,7 +37,7 @@
 
   - synchronize:
       mode: pull
-      src: "rsync://centuryd@{{secret.ip}}{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
+      src: "rsync://{{secret.ip}}{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
       dest: "{{ secret.local_folder }}"
     delegate_to: "{{secret.ip}}"
     tags: mysql
