@@ -39,6 +39,7 @@
       mode: pull
       src: "rsync://{{secret.ip}}{{ secret.remote_folder }}{{ secret.db_name}}_{{ mydate }}.sql"
       dest: "{{ secret.local_folder }}"
+      dest_port: 3422
     delegate_to: "{{secret.ip}}"
     tags: mysql
 
