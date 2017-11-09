@@ -32,7 +32,7 @@
   - synchronize:
       mode: push
       src: "{{ secret.remote_folder }}{{ secret.db_name }}_{{ mydate }}.sql"
-      dest: "rsync://{{secret.remote_user}}@{{secret.hostname}}{{ secret.local_folder_combined }}"
+      dest: "rsync://{{secret.hostname}}{{ secret.local_folder_combined }}"
       dest_port: 3422
     tags: mysql
 
