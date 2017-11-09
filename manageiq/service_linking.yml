@@ -41,7 +41,7 @@
         uid_ems:
           - "{{ ec2.instances[0].id }}"
         provider:
-          id: 26
+          id: 24
 
   - name: Service Linking via and endpoint
     manageiq_vmdb:
