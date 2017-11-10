@@ -11,16 +11,6 @@
 
   - debug: var=sql_file.stdout
 
-  - name: Pull latest db from shared location
-    copy:
-      src: "{{ local_folder_combined }}/{{ sql_file.stdout }}"
-      dest: "{{ remote_folder }}/{{ sql_file.stdout }}"
-      owner: "{{ ansible_ssh_user }}"
-      group: "{{ ansible_ssh_user }}"
-      mode: 0644
-    tags: 
-      mysql
-
   - name: "Update {{ db_name }} database with the latest db file"
     mysql_db:
       login_user: "{{ user }}"
