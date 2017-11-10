@@ -30,22 +30,11 @@
       mysql
 
   - name: Copy back to another server
-    raw: "scp -P3422 {{ secret.remote_folder }}{{ secret.db_name }}_{{ mydate }}.sql centuryd@staging.floridaroadtesting.com:{{ secret.local_folder_combined }}"
-
-    #- synchronize:
-    #-   mode: push
-    #-   src: "{{ secret.remote_folder }}{{ secret.db_name }}_{{ mydate }}.sql"
-    #-   dest: "rsync://{{secret.hostname}}{{ secret.local_folder_combined }}"
-    #-   dest_port: 3422
-    #- tags: mysql
-
+    raw: "scp -P3422 {{ secret.remote_folder }}{{ secret.db_name }}_{{ mydate }}.sql {{ secret.remote_user }}@{{ secret.hostname }}:{{ secret.local_folder_combined }}"
 
 
 - hosts: staging
-  gather_facts: True
   tasks:
-  - set_fact: mydate="{{hostvars['107.170.125.164']['mydate']}}"
-
   - name: Only keep the 2 newest files on Dropbox
     raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | xargs -d '\n' rm --"
     tags:
