@@ -1,9 +1,6 @@
 ---
-- hosts: localhost
+- hosts: staging
   gather_facts: False
-
-  vars_files:
-  - secrets_staging.yml
 
   tasks:
   - name: Grab the newest db dump file
@@ -12,15 +9,6 @@
     tags: 
       config
 
-  - debug: var=sql_file.stdout
-
-- hosts: staging
-  gather_facts: False
-
-  vars_files:
-  - secrets_staging.yml
-
-  tasks:
   - debug: var=hostvars['localhost']['sql_file'].stdout
     when: hostvars['localhost']['sql_file'] is defined
 
@@ -44,15 +32,6 @@
       target: "{{ remote_folder }}/{{ hostvars['localhost']['sql_file'].stdout }}"
     tags:
       mysql
-
-  - name: "Restart all monit services"
-    monit:
-      name: "{{ item }}"
-      state: restarted
-    with_items: "{{ monit }}"
-    become: true
-    tags:
-      monit
 
   - name: Clean up sql file
     shell: "cd {{ remote_folder }} && rm {{ hostvars['localhost']['sql_file'].stdout }}"
