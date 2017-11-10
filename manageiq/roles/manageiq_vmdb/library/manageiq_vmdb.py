@@ -31,7 +31,6 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 module: manageiq_vmdb
 '''
-import dpath.util
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -124,19 +123,11 @@ class ManageIQVmdb(object):
         self._manageiq = manageiq
         self._module = self._manageiq.module
         self._api_url = self._manageiq.api_url
-        self._vmdb = self._manageiq.module.params['vmdb']
+        self._vmdb = self._module.params.get('vmdb') or self._module.params.get('href')
         self._href = None
         self._client = self._manageiq.client
         self._error = None
 
-
-    @property
-    def slug_url(self, value):
-        """
-            The url to connect to the vmdb after parsed from the slug
-        """
-        base_url = value.split('::')[1]
-        return self._api_url + '/' + base_url
 
     @property
     def url(self):
@@ -150,7 +141,9 @@ class ManageIQVmdb(object):
         """
             The url to connect to the vmdb
         """
-        return self._api_url + '/' + self._href
+        if self._href:
+            return self._api_url + '/' + self._href
+        return self._api_url
 
 
     def get(self, alt_url=None):
@@ -167,10 +160,10 @@ class ManageIQVmdb(object):
 
     def parse(self, item):
         """
-            Read what is passed in and return either the dictionary or the url string
+            Read what is passed in and set the _href instance variable
         """
         if isinstance(item, dict):
-            self._href = "services/" + item['id']
+            self._api_url = self._vmdb['href']
         elif isinstance(item, str):
             slug = item.split("::")
             if len(slug) == 2:
@@ -193,13 +186,19 @@ class Vmdb(ManageIQVmdb):
         Object to modify and get the Vmdb Object
     """
 
+    def get_object(self):
+        """
+            Return the VMDB Object
+        """
+        self.parse(self._vmdb)
+        return dict(self.get(self.post_url))
 
-    def action(self, vmdb):
+
+    def action(self):
         """
             Call an action if it exists
         """
-
-        self.parse(vmdb)
+        self.parse(self._vmdb)
         data = self._module.params['data']
         action_string = self._module.params.get('action')
 
@@ -233,10 +232,12 @@ def main():
             argument_spec=dict(
                 manageiq_connection=dict(required=True, type='dict',
                                          options=manageiq_argument_spec()),
-                vmdb=dict(required=True),
+                vmdb=dict(required=False, type='dict'),
                 action=dict(required=False, type='str'),
+                href=dict(required=False, type='str'),
                 data=dict(required=False, type='dict')
                 ),
+            required_one_of=[['vmdb', 'href']]
             )
 
 
@@ -244,7 +245,10 @@ def main():
     vmdb = Vmdb(manageiq)
 
     if module.params.get('action'):
-        result = vmdb.action(module.params['vmdb'])
+        result = vmdb.action()
+        module.exit_json(**result)
+    else:
+        result = vmdb.get_object()
         module.exit_json(**result)
 
     module.fail_json(msg="No VMDB object found")
