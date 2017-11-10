@@ -21,7 +21,6 @@
     manageiq_vmdb:
       href: "services/80"
     register: vmdb_object
-    tags: just_object
 
   - name: Create Ec2 Instance
     ec2:
@@ -49,24 +48,12 @@
         provider:
           id: 24
 
-  - name: Service Linking via an href slug
-    manageiq_vmdb:
-      href: "href_slug::services/80"
-      action: add_provider_vms
-      data:
-        uid_ems:
-          - vm-adsfdf987
-        provider:
-          id: 24
-    tags: just_object
-
   - name: Service Linking via a dict
     manageiq_vmdb:
       vmdb: "{{ vmdb_object }}"
       action: add_provider_vms
       data:
         uid_ems:
-          - asd987adsf
+          - "{{ ec2.instances[0].id }}"
         provider:
           id: 24
-    tags: just_object
