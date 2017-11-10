@@ -21,8 +21,3 @@
       target: "{{ local_folder_combined }}/{{ sql_file.stdout }}"
     tags:
       mysql
-
-  - name: Clean up sql file
-    shell: "cd {{ local_folder_combined }} && rm {{ sql_file.stdout }}"
-    tags:
-      util
