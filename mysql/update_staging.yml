@@ -18,11 +18,11 @@
       login_host: "{{ host }}"
       state: import
       name: "{{ db_name }}"
-      target: "{{ remote_folder }}/{{ sql_file.stdout }}"
+      target: "{{ local_folder_combined }}/{{ sql_file.stdout }}"
     tags:
       mysql
 
   - name: Clean up sql file
-    shell: "cd {{ remote_folder }} && rm {{ sql_file.stdout }}"
+    shell: "cd {{ local_folder_combined }} && rm {{ sql_file.stdout }}"
     tags:
       util
