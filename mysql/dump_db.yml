@@ -1,8 +1,8 @@
 ---
 # Dump a db to a file, save up to 4 versions of that file on the remote system
-#   Fetch the file and save it on the local system (Dropbox)
+#   Fetch the file and save it on the local system.
 #   Save 2 versions on the local system.
-#   Grab the latest version of master from GitHub and save that on Dropbox
+#   Grab the latest version of master from GitHub and save that on the local system.
 - hosts: prod
   gather_facts: False
   tasks:
@@ -35,15 +35,15 @@
 
 - hosts: staging
   tasks:
-  - name: Only keep the 2 newest files on Dropbox
+  - name: Only keep the 2 newest files on the local folder
     raw: "cd {{ secret.local_folder_combined }} && ls -tp | grep -v '/$' | tail -n +3 | xargs -d '\n' rm --"
     tags:
       mysql
 
-  - name: Clone the master branch to Dropbox
+  - name: Clone the master branch to the local folder
     git: 
       repo: "{{ secret.git_repo }}"
-      dest: "{{ secret.git_local_folder }}onramp_git" 
+      dest: "{{ secret.git_local_folder }}{{ secret.db_name }}_git"
       accept_hostkey: "yes"
       force: "yes"
       recursive: "no"
