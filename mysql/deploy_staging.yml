@@ -3,22 +3,18 @@
   gather_facts: False
 
   tasks:
-  - name: Pull in the vars file
-    include_vars:
-      file: deploy_staging_vars.yml
-      name: deploy_staging
-  - name: "Grab the latest from branch: {{ deploy_staging.branch | default('develop') }}"
+  - name: "Grab the latest from branch: {{ branch | default('develop') }}"
     git:
-      repo: "git@github.com:syncrou/onramp.git" 
-      dest: "/home/centuryd/onramp/current" 
-      version: "{{ deploy_staging.branch | default('develop') }}"
+      repo: "{{ repo }}"
+      dest: "{{ destination }}"
+      version: "{{ branch | default('develop') }}"
       update: yes
       force: yes
     tags:
       git
 
   - name: "Migrate the Database"
-    shell: "cd /home/centuryd/onramp/current && RAILS_ENV=frt_prod rake db:migrate"
+    shell: "cd {{ destination }} && RAILS_ENV={{ env }} rake db:migrate"
     register: migrate
     tags:
       db
@@ -29,7 +25,7 @@
     monit:
       name: "{{ item }}"
       state: restarted
-    with_items: "{{ deploy_staging.monit }}"
+    with_items: "{{ monit }}"
     become: true
     tags:
       monit
