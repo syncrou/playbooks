@@ -3,6 +3,12 @@
   gather_facts: False
 
   tasks:
+  - name: Make sure connectivity to git works through the ssh config
+    raw: "ssh {{ repo_test }}"
+    register: test_connect
+
+  - debug: msg=test_connect
+
   - name: "Grab the latest from branch: {{ branch | default('develop') }}"
     git:
       repo: "{{ repo }}"
