@@ -3,7 +3,7 @@
   gather_facts: False
 
   environment:
-    GEM_PATH: /home/centuryd/.gem/ruby/2.0.0:/home/centuryd/.rbenv/versions/2.0.0-p648/lib/ruby/gems/2.0.0
+    GEM_PATH: "{{ gem_path }}"
     PATH: "{{ path }}"
 
   tasks:
