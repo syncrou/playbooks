@@ -4,7 +4,7 @@
 
   environment:
     GEM_PATH: /home/centuryd/.gem/ruby/2.0.0:/home/centuryd/.rbenv/versions/2.0.0-p648/lib/ruby/gems/2.0.0
-    PATH: /home/centuryd/bin:/home/centuryd/.local/bin:/home/centuryd/.rbenv/shims:/home/centuryd/.rbenv/bin:/home/centuryd/.dotfiles/bin:/home/dbomhof/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+    PATH: "{{ path }}"
 
   tasks:
   - name: "Grab the latest from branch: {{ branch | default('develop') }}"
@@ -26,10 +26,7 @@
   - debug: var=migrate.stdout
 
   - name: "Restart all monit services"
-    monit:
-      name: "{{ item }}"
-      state: restarted
-    with_items: "{{ monit }}"
+    raw: "monit restart all"
     become: true
     tags:
       monit
