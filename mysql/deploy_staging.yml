@@ -2,6 +2,9 @@
 - hosts: staging
   gather_facts: False
 
+  environment:
+    GEM_PATH: /home/centuryd/.gem/ruby/2.0.0
+
   tasks:
   - name: "Grab the latest from branch: {{ branch | default('develop') }}"
     git:
