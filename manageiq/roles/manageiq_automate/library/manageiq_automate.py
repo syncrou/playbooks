@@ -230,7 +230,7 @@ class Workspace(ManageIQAutomate):
             Get the passed in attribute from the Workspace
         """
 
-        if self.attribute_exists(dict_options):
+        if self.attribute_exists(dict_options)['value']:
             return_value = self._target['workspace']['input']['objects'][dict_options['object']][dict_options['attribute']]
 
             return dict(changed=False, value=return_value)
