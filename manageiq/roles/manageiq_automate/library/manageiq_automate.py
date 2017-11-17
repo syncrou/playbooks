@@ -32,7 +32,7 @@ DOCUMENTATION = '''
 module: manageiq_automate
 '''
 import json
-import dpath.util
+import operator
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
@@ -119,9 +119,9 @@ class ManageIQAutomate(object):
         """
             Validate all passed objects before attempting to set or get values from them
         """
-
+        list_path = path.split("|")
         try:
-            return bool(dpath.util.get(self._target, path, '|'))
+            return bool(reduce(operator.getitem, list_path, self._target))
         except KeyError as error:
             return False
 
@@ -167,7 +167,7 @@ class Workspace(ManageIQAutomate):
             Check if the specific object exists
         """
 
-        search_path = "workspace|result|input|objects|" + self.get_real_object_name(dict_options)
+        search_path = "workspace|input|objects|" + self.get_real_object_name(dict_options)
 
         if self.exists(search_path):
             return dict(changed=False, value=True)
@@ -181,7 +181,7 @@ class Workspace(ManageIQAutomate):
 
         obj = self.get_real_object_name(dict_options)
         attribute = dict_options['attribute']
-        path = "workspace|result|input|objects"
+        path = "workspace|input|objects"
         search_path = "|".join([path, obj, attribute])
         if self.exists(search_path):
             return dict(changed=False, value=True)
@@ -194,7 +194,7 @@ class Workspace(ManageIQAutomate):
         """
 
         attribute = dict_options['attribute']
-        path = "workspace|result|input|state_vars"
+        path = "workspace|input|state_vars"
         search_path = "|".join([path, attribute])
         if self.exists(search_path):
             return dict(changed=False, value=True)
@@ -207,7 +207,7 @@ class Workspace(ManageIQAutomate):
         """
 
         parameter = dict_options['parameter']
-        path = "workspace|result|input|method_parameters"
+        path = "workspace|input|method_parameters"
         search_path = "|".join([path, parameter])
         if self.exists(search_path):
             return dict(changed=False, value=True)
@@ -244,7 +244,7 @@ class Workspace(ManageIQAutomate):
         """
         return_value = None
 
-        if self.state_var_exists(dict_options):
+        if self.state_var_exists(dict_options)['value']:
             return_value = self._target['workspace']['input']['state_vars'][dict_options['attribute']]
 
             return dict(changed=False, value=return_value)
@@ -258,7 +258,7 @@ class Workspace(ManageIQAutomate):
         """
         return_value = None
 
-        if self.method_parameter_exists(dict_options):
+        if self.method_parameter_exists(dict_options)['value']:
             return_value = self._target['workspace']['input']['method_parameters'][dict_options['parameter']]
 
             return dict(changed=False, value=return_value)
@@ -485,7 +485,6 @@ def main():
         'get_state_var_names':module.params['get_state_var_names']
         }
 
-    #manageiq = ManageIQ(module)
     workspace = Workspace(module, module.params['workspace'])
 
     for key, value in boolean_opts.iteritems():
