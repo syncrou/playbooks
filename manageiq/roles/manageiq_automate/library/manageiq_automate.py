@@ -31,88 +31,10 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 module: manageiq_automate
 '''
+import json
 import dpath.util
 from ansible.module_utils.basic import AnsibleModule
-
-
-try:
-    from manageiq_client.api import ManageIQClient
-    HAS_CLIENT = True
-except ImportError:
-    HAS_CLIENT = False
-
-
-def check_client(module):
-    if not HAS_CLIENT:
-        module.fail_json(msg='manageiq_client.api is required for this module')
-
-
-def validate_connection_params(module):
-    params = module.params['manageiq_connection']
-    error_str = "missing required argument: manageiq_connection[{}]"
-    url = params['url']
-    token = params.get('token')
-    username = params.get('username')
-    password = params.get('password')
-
-    if (url and username and password) or (url and token):
-        return params
-    for arg in ['url', 'username', 'password']:
-        if params[arg] in (None, ''):
-            module.fail_json(msg=error_str.format(arg))
-
-
-class ManageIQ(object):
-    """
-        class encapsulating ManageIQ API client.
-    """
-
-    def __init__(self, module):
-        # handle import errors
-        check_client(module)
-        params = validate_connection_params(module)
-
-        url = params['url']
-        username = params.get('username')
-        password = params.get('password')
-        token = params.get('token')
-        verify_ssl = params.get('verify_ssl')
-        ca_bundle_path = params.get('ca_bundle_path')
-
-        self._module = module
-        self._api_url = url + '/api'
-        self._auth = dict(user=username, password=password, token=token)
-        try:
-            self._client = ManageIQClient(self._api_url, self._auth, verify_ssl=verify_ssl, ca_bundle_path=ca_bundle_path)
-        except Exception as e:
-            self.module.fail_json(msg="failed to open connection (%s): %s" % (url, str(e)))
-
-    @property
-    def module(self):
-        """ Ansible module module
-
-        Returns:
-            the ansible module
-        """
-        return self._module
-
-    @property
-    def api_url(self):
-        """ Base ManageIQ API
-
-        Returns:
-            the base ManageIQ API
-        """
-        return self._api_url
-
-    @property
-    def client(self):
-        """ ManageIQ client
-
-        Returns:
-            the ManageIQ client
-        """
-        return self._client
+from ansible.module_utils.urls import fetch_url
 
 
 class ManageIQAutomate(object):
@@ -120,21 +42,28 @@ class ManageIQAutomate(object):
         Object to execute automate workspace management operations in manageiq.
     """
 
-    def __init__(self, manageiq, workspace):
-        self._manageiq = manageiq
+    def __init__(self, module, workspace):
         self._target = workspace
+        self._module = module
+        self._api_url = self._module.params['manageiq_connection']['url'] + '/api'
+        self._auth = self._build_auth()
 
-        self._module = self._manageiq.module
-        self._api_url = self._manageiq.api_url
-        self._client = self._manageiq.client
-        self._error = None
+
+    def _build_auth(self):
+        self._headers = {'Content-Type': 'application/json; charset=utf-8'}
+        if self._module.params['manageiq_connection'].get('token'):
+            self._headers["X-Auth-Token"] = self._module.params['manageiq_connection']['token']
+        else:
+            self._module.params['url_username'] = self._module.params['manageiq_connection']['username']
+            self._module.params['url_password'] = self._module.params['manageiq_connection']['password']
+
 
 
     def url(self):
         """
             The url to connect to the workspace
         """
-        url_str = self._manageiq.module.params['manageiq_connection']['automate_workspace']
+        url_str = self._module.params['manageiq_connection']['automate_workspace']
         return self._api_url + '/' + url_str
 
 
@@ -154,32 +83,36 @@ class ManageIQAutomate(object):
             url = alt_url
         else:
             url = self.url()
-        result = self._client.get(url)
-        return dict(result)
+
+        result, _info = fetch_url(self._module, url, None, self._headers, 'get')
+        return json.loads(result.read())
 
 
     def set(self, data):
         """
             Set any attribute, object from the REST API
         """
-        result = self._client.post(self.url(), action='edit', resource=data)
-        return  result
+        post_data = json.dumps(dict(action='edit', resource=data))
+        result, _info = fetch_url(self._module, self.url(), post_data, self._headers, 'post')
+        return  json.loads(result.read())
 
 
     def encrypt(self, data):
         """
             Set any attribute, object from the REST API
         """
-        result = self._client.post(self.url(), action='encrypt', resource=data)
-        return  result
+        post_data = json.dumps(dict(action='encrypt', resource=data))
+        result, _info = fetch_url(self._module, self.url(), post_data, self._headers, 'post')
+        return  json.loads(result.read())
 
 
     def decrypt(self, data):
         """
             Decrypt any attribute, object from the REST API
         """
-        result = self._client.post(self.url(), action='decrypt', resource=data)
-        return  result
+        post_data = json.dumps(dict(action='decrypt', resource=data))
+        result, _info = fetch_url(self._module, self.url(), post_data, self._headers, 'post')
+        return  json.loads(result.read())
 
 
     def exists(self, path):
@@ -552,8 +485,8 @@ def main():
         'get_state_var_names':module.params['get_state_var_names']
         }
 
-    manageiq = ManageIQ(module)
-    workspace = Workspace(manageiq, module.params['workspace'])
+    #manageiq = ManageIQ(module)
+    workspace = Workspace(module, module.params['workspace'])
 
     for key, value in boolean_opts.iteritems():
         if value:

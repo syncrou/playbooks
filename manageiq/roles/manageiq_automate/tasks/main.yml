@@ -3,8 +3,6 @@
   pip:
     name: "{{ item }}"
   with_items:
-    - git+https://github.com/syncrou/manageiq-api-client-python.git#egg=manageiq_client
-    - requests
     - dpath
 
 - name: "Initialize the Workspace"
@@ -12,4 +10,3 @@
     initialize_workspace: 
       auto_commit: "{{ auto_commit }}"
   register: workspace
-  tags: blah

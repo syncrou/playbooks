@@ -41,8 +41,9 @@
         workspace: "{{ workspace }}"
         set_state_var:
           attribute: "job_id"
-          value: "xyz"
+          value: "12345"
       register: workspace
+      tags: blah
 
     - name: "Check a Method Parameter"
       manageiq_automate:
