@@ -7,7 +7,7 @@
 
   gather_facts: False
   roles:
-  - manageiq_automate
+  - syncrou.manageiq-automate
 
   tasks:
     - name: "Check an attribute"
