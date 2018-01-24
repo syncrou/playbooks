@@ -1,0 +1,18 @@
+---
+- name: Grab a service
+  hosts: localhost
+  connection: local
+  vars:
+  - object: root
+
+  gather_facts: False
+  roles:
+  - syncrou.manageiq-vmdb
+
+  tasks:
+    - name: Get a service
+      manageiq_vmdb:
+        href: /services/86
+      register: service
+
+    - debug: msg="service dialog is {{ service.options.dialog }}"
