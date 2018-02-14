@@ -1,0 +1,22 @@
+---
+- name: Update Task options
+  hosts: localhost
+  connection: local
+  vars:
+  - object: root
+
+  gather_facts: False
+  roles:
+  - syncrou.manageiq-automate
+  - syncrou.manageiq-vmdb
+
+  tasks:
+    - name: Update vmname in Task options
+      manageiq_vmdb:
+        href: "{{ manageiq.request_task }}"
+        action: edit
+        data: 
+          options:
+            vm_target_name: "name_from_ansible"
+            cpu_limit: 4
+            vm_memory: 4096
