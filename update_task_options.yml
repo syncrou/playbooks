@@ -8,6 +8,7 @@
   gather_facts: False
   roles:
   - syncrou.manageiq-automate
+  - syncrou.manageiq-vmdb
 
   tasks:
     - name: Update vmname in Task options
