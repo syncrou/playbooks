@@ -15,7 +15,8 @@
 
     - name: Update vmname in Task options
       manageiq_vmdb:
-        href: "{{ manageiq.request_task }}"
+        #href: "{{ manageiq.request_task }}"
+        href: "href_slug::provision_requests/1"
         action: edit
         data: 
           options:
