@@ -4,12 +4,13 @@
   connection: local
   vars:
     - auto_commit: true
-    - manageiq_connection:
-        url: 'https://localhost.ssl:3000'
-        username: 'admin'
-        password: 'smartvm'
-        automate_workspace: '1234'
-        validate_certs: false
+      manageiq_validate_certs: false
+      #- manageiq_connection:
+      #-   url: 'https://localhost.ssl:3000'
+      #-   username: 'admin'
+      #-   password: 'smartvm'
+      #-   automate_workspace: '1234'
+      #-   validate_certs: false
 
 
   gather_facts: False

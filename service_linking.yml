@@ -12,15 +12,21 @@
   - image: ami-60b6c60a
   - region: us-east-1
   - subnet: subnet-f849ff96
+  - manageiq_connection:
+      url: 'https://localhost.ssl:3000'
+      username: 'admin'
+      password: 'smartvm'
+      manageiq_validate_certs: false
 
   roles:
-  - manageiq_vmdb
+  - syncrou.manageiq-vmdb
 
   tasks:
   - name: Get a vmdb object
     manageiq_vmdb:
       href: "services/80"
     register: vmdb_object
+    tags: vmdb
 
   - name: Create Ec2 Instance
     ec2:
@@ -54,6 +60,7 @@
       action: add_provider_vms
       data:
         uid_ems:
-          - "{{ ec2.instances[0].id }}"
+          - "asdf234"
         provider:
           id: 24
+    tags: vmdb
