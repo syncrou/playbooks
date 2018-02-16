@@ -11,6 +11,8 @@
   - syncrou.manageiq-vmdb
 
   tasks:
+    - debug: msg="root object attributes:{{ manageiq }}"
+
     - name: Update vmname in Task options
       manageiq_vmdb:
         href: "{{ manageiq.request_task }}"
