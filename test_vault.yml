@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - include_vars: vars/vault_vars.yml
+    - debug: msg="this is a vault test Username {{ vault_username | default('no username') }}, Password {{ vault_password | default('no password') }}"
