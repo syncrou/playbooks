@@ -6,6 +6,6 @@
   hosts: localhost
   gather_facts: false
   roles:
-  - { role: /Users/dbomhof/syncrou/manageiq-approval, tags: tagged }
+  - { role: /Users/dbomhof/syncrou/manageiq-approval, tags: tagged, any_errors_fatal: true }
   tasks:
   - debug: msg="Just finished the tasks"
