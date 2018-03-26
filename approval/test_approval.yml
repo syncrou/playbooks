@@ -1,0 +1,11 @@
+---
+- name: Testing the ManageIQ Approval Role
+  vars:
+    approval:
+      failed: false
+  hosts: localhost
+  gather_facts: false
+  roles:
+  - { role: /Users/dbomhof/syncrou/manageiq-approval, tags: tagged }
+  tasks:
+  - debug: msg="Just finished the tasks"
