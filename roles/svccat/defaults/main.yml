@@ -1,0 +1,12 @@
+---
+# defaults file for svccat
+dest: /Users/dbomhof/test_svccat
+chrome_repo: git@github.com:RedHatInsights/insights-chrome.git
+insights_proxy_repo: git@github.com:RedHatInsights/insights-proxy.git
+svccat_api_repo: https://gitlab.cloudforms.lab.eng.rdu2.redhat.com/insights/insights-api-service_catalog.git
+svccat_ui_repo: https://gitlab.cloudforms.lab.eng.rdu2.redhat.com/insights/insights-ui-service_catalog.git
+database_url: "postgres://root:buttons@0.0.0.0/service_catalog_development"
+manageiq_user: admin
+manageiq_password: smartvm
+manageiq_host: 0.0.0.0
+manageiq_port: 3000

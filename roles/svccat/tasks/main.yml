@@ -1,0 +1,76 @@
+---
+# tasks file for svccat
+
+- name: Pull Down Insights Proxy
+  git:
+    repo: "{{ insights_proxy_repo }}"
+    dest: "{{ dest }}/insights-proxy"
+    version: "master"
+    force: "yes"
+
+- name: Setup the initial /etc/hosts entries
+  shell: "sh {{ dest }}/insights-proxy/scripts/patch-etc-hosts.sh"
+  become: true
+
+- name: Pull / Update the proxy container
+  shell: "sh {{ dest }}/insights-proxy/scripts/update.sh"
+
+- name: Pull Down Chrome
+  git:
+    repo: "{{ chrome_repo }}"
+    dest: "{{ dest }}/insights-chrome"
+    version: "master"
+    force: "yes"
+
+- name: Update Chrome
+  shell: "cd {{ dest }}/insights-chrome && npm install && npm run build"
+
+- name: Pull Down SvcCat API server
+  git:
+    repo: "{{ svccat_api_repo }}"
+    dest: "{{ dest }}/insights-api-service_catalog"
+    version: "master"
+    force: "yes"
+
+- name: Setup the Dockerfile
+  shell: "cd {{ dest }}/insights-api-service_catalog && cp {{ dest }}/insights-api-service_catalog/config/containers/DockerfileDev {{ dest }}/insights-api-service_catalog/Dockerfile"
+
+- name: Setup the Docker container
+  shell: "cd {{ dest }}/insights-api-service_catalog && docker build -t svccat ."
+
+- name: Run the Docker container
+  shell: | 
+    docker run -p 5000:5000 --name=svccat \ 
+    -e DATABASE_URL={{ database_url }} \
+    -e MANAGEIQ_USER={{ manageiq_user }} \ 
+    -e MANAGEIQ_PASSWORD={{ manageiq_password }} \
+    -e MANAGEIQ_HOST={{ manageiq_host }} \
+    -e MANAGEIQ_PORT={{ manageiq_port }} \
+    --volume={{ dest }}/insights-api-service_catalog:/var/www/svccat -d svccat
+
+- name: Create the db
+  # Removing the t from -it allows a non tty shell
+  shell: "docker exec -i svccat rake db:create"
+  ignore_errors: True
+
+- name: Run the migrations
+  shell: "docker exec -i svccat rake db:migrate"
+  ignore_errors: True
+
+- name: Pull Down SvcCat UI
+  git:
+    repo: "{{ svccat_ui_repo }}"
+    dest: "{{ dest }}/insights-ui-service_catalog"
+    version: "master"
+    force: "yes"
+
+- name: Update NPM for UI
+  shell: "cd {{ dest }}/insights-ui-service_catalog && npm install"
+
+- name: Start up Chrome and the Proxy
+  debug:
+    msg: "cd {{ dest }}/insights-chrome/build && LOCAL_CHROME=true bash {{ dest }}/insights-proxy/scripts/run.sh"
+
+- name: Start up the UI
+  debug:
+    msg: "cd {{ dest }}/insights-ui-service_catalog && npm run start"
